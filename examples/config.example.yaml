@@ -1,0 +1,66 @@
+# Local LLM Benchmark - Example Configuration
+# ============================================
+# Copy this to config.yaml and customize.
+
+# Benchmark prompt
+# Use /no_think for Qwen3 models to disable chain-of-thought reasoning
+prompt: |
+  /no_think
+  Extract information from the following text and return ONLY valid JSON.
+  Do not include any explanation or markdown code blocks.
+
+  Extract:
+  - title: the main topic
+  - key_points: array of important points
+  - sentiment: positive, negative, or neutral
+
+  Text:
+  """
+  Your text here...
+  """
+
+# Ground truth for automatic F1 evaluation (optional)
+# If provided, the benchmark will calculate precision/recall/F1
+# ground_truth:
+#   title: "Expected Title"
+#   key_points:
+#     - "First key point"
+#     - "Second key point"
+#   sentiment: "positive"
+
+# Models to benchmark
+# Memory is auto-detected from Ollama/MLX cache - no manual config needed
+models:
+  # Small models - faster inference
+  - name: MLX - 8B
+    model_id: mlx-community/Qwen3-8B-4bit
+    backend: mlx
+
+  - name: Ollama - 8B
+    model_id: qwen3:8b
+    backend: ollama
+
+  # Large models - higher quality
+  - name: MLX - 30B
+    model_id: mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit
+    backend: mlx
+
+  - name: Ollama - 30B
+    model_id: qwen3-coder:30b-a3b-q4_K_M
+    backend: ollama
+
+# Settings
+settings:
+  # API parameters (same for both backends)
+  temperature: 0.3          # Lower = more deterministic
+  max_tokens: 8192          # Max output tokens
+
+  # Memory management
+  min_free_ram_buffer_gb: 4 # Keep this much RAM free
+
+  # MLX server
+  auto_start_mlx_server: true
+  mlx_server_port: 8080
+
+  # Timeout per benchmark run
+  timeout_seconds: 600

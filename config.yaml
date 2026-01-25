@@ -1,0 +1,122 @@
+# Local LLM Benchmark Configuration
+# ==================================
+# Structured extraction benchmark with automatic F1 scoring
+
+prompt: |
+  /no_think
+  Extract information from the following meeting transcript and return ONLY valid JSON.
+  Do not include any text before or after the JSON. Do not use markdown code blocks.
+  Do not include any reasoning or explanation.
+
+  Extract:
+  - projects: array of objects with {name, hypothesis, methods (array), decision (null if none), owner, deadline}
+  - action_items: array of objects with {task, assignee, due_date}
+  - attendees: array of names (use full names as they appear in the transcript)
+  - meeting_date: the date of the meeting
+
+  For project names, use the descriptive name (e.g., "Customer Churn Prediction" not "Project Alpha").
+  For owner and assignee fields, use full names (e.g., "Sarah Chen" not just "Sarah").
+
+  Meeting transcript:
+  """
+  Q4 Planning - Data Science Sync (January 15, 2025)
+  Attendees: Sarah Chen (DS Lead), Mike Patel (ML Engineer), Lisa Wong (Product Manager), James Rivera (Data Analyst)
+
+  Project Alpha - Customer Churn Prediction
+  Sarah presented the hypothesis that engagement score drops greater than 20% predict churn within 30 days. The team discussed evaluation approaches. Mike suggested comparing logistic regression, XGBoost, and a simple neural network. After discussion, the decision was made to proceed with XGBoost as the baseline model. Sarah will own this project with a target completion date of February 28.
+
+  Project Beta - Recommendation Engine Improvements
+  Lisa raised concerns about the cold-start problem affecting new user experience. The hypothesis is that collaborative filtering underperforms for users with fewer than 5 interactions. Methods to evaluate include content-based fallback and popularity-based recommendations. No decision was reached - the team needs more data before proceeding. Mike will prepare an analysis by February 10.
+
+  Project Gamma - Fraud Detection Pipeline
+  James presented early findings on transaction anomalies. The hypothesis is that velocity-based features (transactions per hour) combined with amount deviation will catch 90% of fraud cases. Methods under consideration are isolation forest, autoencoder, and rule-based thresholds. Decision: start with isolation forest for quick wins. James owns this with a deadline of March 15.
+
+  Action Items:
+  - Sarah: Set up XGBoost training pipeline by February 1
+  - Mike: Complete cold-start user analysis by February 10
+  - Lisa: Prepare stakeholder update deck by January 22
+  - James: Deploy isolation forest prototype by February 5
+  - Mike: Review James's fraud detection features by February 8
+  """
+
+# Ground truth for evaluation
+ground_truth:
+  meeting_date: "January 15, 2025"
+  attendees:
+    - "Sarah Chen"
+    - "Mike Patel"
+    - "Lisa Wong"
+    - "James Rivera"
+  projects:
+    - name: "Customer Churn Prediction"
+      hypothesis: "engagement score drops greater than 20% predict churn within 30 days"
+      methods:
+        - "logistic regression"
+        - "XGBoost"
+        - "neural network"
+      decision: "proceed with XGBoost as the baseline model"
+      owner: "Sarah Chen"
+      deadline: "February 28"
+    - name: "Recommendation Engine Improvements"
+      hypothesis: "collaborative filtering underperforms for users with fewer than 5 interactions"
+      methods:
+        - "content-based fallback"
+        - "popularity-based recommendations"
+      decision: null
+      owner: "Mike Patel"
+      deadline: "February 10"
+    - name: "Fraud Detection Pipeline"
+      hypothesis: "velocity-based features combined with amount deviation will catch 90% of fraud cases"
+      methods:
+        - "isolation forest"
+        - "autoencoder"
+        - "rule-based thresholds"
+      decision: "start with isolation forest for quick wins"
+      owner: "James Rivera"
+      deadline: "March 15"
+  action_items:
+    - task: "Set up XGBoost training pipeline"
+      assignee: "Sarah Chen"
+      due_date: "February 1"
+    - task: "Complete cold-start user analysis"
+      assignee: "Mike Patel"
+      due_date: "February 10"
+    - task: "Prepare stakeholder update deck"
+      assignee: "Lisa Wong"
+      due_date: "January 22"
+    - task: "Deploy isolation forest prototype"
+      assignee: "James Rivera"
+      due_date: "February 5"
+    - task: "Review fraud detection features"
+      assignee: "Mike Patel"
+      due_date: "February 8"
+
+# Models to benchmark
+# Fair comparison: All models are Qwen3 family with Q4 quantization
+# Memory is auto-detected from Ollama/MLX cache
+models:
+  - name: MLX - 8B
+    model_id: mlx-community/Qwen3-8B-4bit
+    backend: mlx
+
+  - name: MLX - 30B
+    model_id: mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit
+    backend: mlx
+
+  - name: Ollama - 8B
+    model_id: qwen3:8b
+    backend: ollama
+
+  - name: Ollama - 30B
+    model_id: qwen3-coder:30b-a3b-q4_K_M
+    backend: ollama
+
+# Settings
+settings:
+  min_free_ram_buffer_gb: 4
+  auto_start_mlx_server: true
+  mlx_server_port: 8080
+  timeout_seconds: 600
+  # API parameters (same for both backends for fair comparison)
+  temperature: 0.3          # Lower for more deterministic structured output
+  max_tokens: 8192          # Doubled to handle any residual thinking
