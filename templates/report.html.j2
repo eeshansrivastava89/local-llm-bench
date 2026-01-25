@@ -154,7 +154,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold text-text">LLM Benchmark Report</h1>
+                        <h1 class="text-2xl font-bold text-text">Local LLM Benchmark Report</h1>
                         <p class="text-sm text-muted">Local inference performance analysis</p>
                     </div>
                 </div>
@@ -211,16 +211,17 @@
                 <p class="text-2xl font-semibold text-text mt-1">{{ total_runs }}</p>
             </div>
             <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Best F1</p>
+                <p class="text-xs font-medium text-muted uppercase tracking-wide">Best Avg F1</p>
                 <p class="text-2xl font-semibold text-emerald-500 mt-1">{{ best_f1 }}%</p>
+                <p class="text-xs text-muted mt-0.5">{{ best_f1_model }}</p>
             </div>
             <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Fastest Model</p>
+                <p class="text-xs font-medium text-muted uppercase tracking-wide">Fastest Avg</p>
                 <p class="text-2xl font-semibold text-indigo-500 mt-1">{{ fastest_time }}s</p>
                 <p class="text-xs text-muted mt-0.5">{{ fastest_model }}</p>
             </div>
             <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Lowest Memory</p>
+                <p class="text-xs font-medium text-muted uppercase tracking-wide">Lowest Avg Memory</p>
                 <p class="text-2xl font-semibold text-violet-500 mt-1">{{ lowest_memory }} GB</p>
                 <p class="text-xs text-muted mt-0.5">{{ lowest_memory_model }}</p>
             </div>
@@ -393,7 +394,10 @@
         const dataTable = new simpleDatatables.DataTable("#results-table", {
             searchable: true,
             sortable: true,
-            perPage: 25
+            perPage: 25,
+            columns: [
+                { select: 0, sort: "desc" }  // Sort by timestamp descending
+            ]
         });
 
         // Get theme-aware colors
@@ -487,9 +491,10 @@
                 },
                 legend: {
                     orientation: 'h',
-                    y: -0.25,
+                    y: -0.35,
                     font: { size: 11, color: c.text }
                 },
+                margin: { t: 40, b: 80, l: 60, r: 20 },
                 hovermode: 'closest'
             };
 
@@ -517,7 +522,7 @@
             const bubbleTrace = {
                 x: activeModels.map(m => modelStats[m].avgTime),
                 y: activeModels.map(m => modelStats[m].avgF1 * 100),
-                mode: 'markers+text',
+                mode: 'markers',
                 marker: {
                     size: activeModels.map(m => {
                         const mem = modelStats[m].avgMemory || 1;
@@ -527,9 +532,6 @@
                     opacity: 0.8,
                     line: { width: 1, color: 'white' }
                 },
-                text: activeModels.map(m => m.split('/').pop()),
-                textposition: 'top center',
-                textfont: { size: 10, color: c.text },
                 hovertemplate: activeModels.map(m => {
                     const s = modelStats[m];
                     return `<b>${m}</b><br>` +

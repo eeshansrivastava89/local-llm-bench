@@ -63,6 +63,35 @@ CSV_COLUMNS = [
 ]
 PROMPT_PREVIEW_LENGTH = 60
 
+# Prompt limits
+MAX_PROMPT_SIZE_BYTES = 1_000_000  # 1MB limit
+
+# Evaluation
+FUZZY_MATCH_THRESHOLD = 0.8
+
+
+# =============================================================================
+# Validation Functions
+# =============================================================================
+
+def validate_model_config(model: dict, index: int) -> None:
+    """Validate a model config has required fields.
+
+    Args:
+        model: Model configuration dictionary
+        index: Zero-based index for error messages
+
+    Raises:
+        ValueError: If required fields are missing or invalid
+    """
+    required_fields = ["name", "model_id", "backend"]
+    for field in required_fields:
+        if field not in model:
+            raise ValueError(f"Model {index + 1} missing required field: {field}")
+
+    if model["backend"] not in ("mlx", "ollama"):
+        raise ValueError(f"Model {index + 1} has invalid backend: {model['backend']}")
+
 
 # =============================================================================
 # Utility Functions
@@ -90,8 +119,31 @@ def get_prompt_hash(prompt: str) -> str:
     return hashlib.sha256(prompt.encode()).hexdigest()[:8]
 
 
+def get_short_model_name(name: str) -> str:
+    """Get short model name (last part after /).
+
+    Args:
+        name: Full model name, possibly with org prefix
+
+    Returns:
+        Short name without org prefix
+    """
+    return name.split("/")[-1] if "/" in name else name
+
+
 def save_prompt_if_new(results_dir: Path, prompt: str) -> str:
-    """Save prompt to file if not already saved. Returns hash."""
+    """Save prompt to file if not already saved. Returns hash.
+
+    Raises:
+        ValueError: If prompt exceeds MAX_PROMPT_SIZE_BYTES
+    """
+    prompt_bytes = len(prompt.encode('utf-8'))
+    if prompt_bytes > MAX_PROMPT_SIZE_BYTES:
+        raise ValueError(
+            f"Prompt size ({prompt_bytes} bytes) exceeds maximum "
+            f"of {MAX_PROMPT_SIZE_BYTES} bytes"
+        )
+
     prompt_hash = get_prompt_hash(prompt)
     prompts_dir = results_dir / "prompts"
     prompts_dir.mkdir(parents=True, exist_ok=True)
@@ -321,20 +373,27 @@ def get_system_info() -> dict:
 
 
 def get_system_memory_gb() -> float:
-    """Get total system RAM in GB."""
-    if platform.system() == "Darwin":
-        result = subprocess.run(
-            ["sysctl", "-n", "hw.memsize"],
-            capture_output=True,
-            text=True,
-        )
-        return int(result.stdout.strip()) / (1024**3)
-    else:
-        with open("/proc/meminfo") as f:
-            for line in f:
-                if line.startswith("MemTotal:"):
-                    return int(line.split()[1]) / (1024**2)
-    return 0
+    """Get total system RAM in GB.
+
+    Returns 8.0 as a safe default for unsupported platforms.
+    """
+    try:
+        if platform.system() == "Darwin":
+            result = subprocess.run(
+                ["sysctl", "-n", "hw.memsize"],
+                capture_output=True,
+                text=True,
+            )
+            return int(result.stdout.strip()) / (1024**3)
+        elif platform.system() == "Linux":
+            with open("/proc/meminfo") as f:
+                for line in f:
+                    if line.startswith("MemTotal:"):
+                        return int(line.split()[1]) / (1024**2)
+    except Exception:
+        pass
+    # Fallback for unsupported platforms or errors
+    return 8.0
 
 
 def get_available_memory_gb() -> float:
@@ -379,7 +438,12 @@ def get_memory_pressure() -> dict:
         "timestamp": datetime.now().isoformat(),
     }
     stats["used_gb"] = stats["total_gb"] - stats["available_gb"]
-    stats["used_percent"] = (stats["used_gb"] / stats["total_gb"]) * 100
+    # Guard against division by zero
+    stats["used_percent"] = (
+        (stats["used_gb"] / stats["total_gb"]) * 100
+        if stats["total_gb"] > 0
+        else 0
+    )
     return stats
 
 
@@ -410,13 +474,40 @@ def is_mlx_server_running(port: int = 8080) -> bool:
         return False
 
 
+def verify_mlx_server_health(port: int = 8080) -> bool:
+    """Verify MLX server is responding to API requests.
+
+    This provides a stronger check than just port availability,
+    ensuring the server is actually ready to handle requests.
+    """
+    try:
+        req = urllib.request.Request(f"http://localhost:{port}/v1/models")
+        with urllib.request.urlopen(req, timeout=2) as response:
+            return response.status == 200
+    except Exception:
+        return False
+
+
+def kill_mlx_processes() -> None:
+    """Kill any running MLX server processes."""
+    subprocess.run(["pkill", "-f", "mlx_lm.server"], capture_output=True)
+    subprocess.run(["pkill", "-f", "mlx_lm server"], capture_output=True)
+
+
 def start_mlx_server(model_id: str, port: int = 8080) -> Optional[subprocess.Popen]:
-    """Start MLX server for a specific model."""
+    """Start MLX server for a specific model.
+
+    Args:
+        model_id: The model identifier
+        port: Port to run the server on
+
+    Returns:
+        The subprocess.Popen object if successful, None otherwise
+    """
     print(f"  Starting MLX server for {model_id}...")
     print(f"  This may take 30-60 seconds to load the model...")
 
-    subprocess.run(["pkill", "-f", "mlx_lm.server"], capture_output=True)
-    subprocess.run(["pkill", "-f", "mlx_lm server"], capture_output=True)
+    kill_mlx_processes()
     time.sleep(MLX_STARTUP_SLEEP_SEC)
 
     proc = subprocess.Popen(
@@ -434,9 +525,12 @@ def start_mlx_server(model_id: str, port: int = 8080) -> Optional[subprocess.Pop
     )
 
     for i in range(MLX_STARTUP_TIMEOUT_SEC):
+        # Check if port is open first (faster check)
         if is_mlx_server_running(port):
-            print(f"  ✓ MLX server ready on port {port} (took {i+1}s)")
-            return proc
+            # Then verify the server is actually responding to API requests
+            if verify_mlx_server_health(port):
+                print(f"  ✓ MLX server ready on port {port} (took {i+1}s)")
+                return proc
 
         if proc.poll() is not None:
             print(f"  ✗ MLX server process died (exit code: {proc.returncode})")
@@ -451,7 +545,7 @@ def start_mlx_server(model_id: str, port: int = 8080) -> Optional[subprocess.Pop
     return None
 
 
-def stop_mlx_server(proc: Optional[subprocess.Popen] = None):
+def stop_mlx_server(proc: Optional[subprocess.Popen] = None) -> None:
     """Stop MLX server."""
     if proc:
         proc.terminate()
@@ -460,8 +554,7 @@ def stop_mlx_server(proc: Optional[subprocess.Popen] = None):
         except subprocess.TimeoutExpired:
             proc.kill()
 
-    subprocess.run(["pkill", "-f", "mlx_lm.server"], capture_output=True)
-    subprocess.run(["pkill", "-f", "mlx_lm server"], capture_output=True)
+    kill_mlx_processes()
     time.sleep(MLX_SHUTDOWN_SLEEP_SEC)
 
 
@@ -571,7 +664,7 @@ def is_ollama_running() -> bool:
         return False
 
 
-def stop_ollama_model(model_id: str):
+def stop_ollama_model(model_id: str) -> None:
     """Unload an Ollama model from memory."""
     print(f"  Unloading Ollama model: {model_id}...")
     result = subprocess.run(
@@ -596,7 +689,7 @@ def normalize_string(s: str) -> str:
     return re.sub(r'\s+', ' ', str(s).lower().strip())
 
 
-def fuzzy_match(pred: str, truth: str, threshold: float = 0.8) -> bool:
+def fuzzy_match(pred: str, truth: str, threshold: float = FUZZY_MATCH_THRESHOLD) -> bool:
     """Check if predicted string fuzzy matches truth."""
     pred_norm = normalize_string(pred)
     truth_norm = normalize_string(truth)
@@ -625,6 +718,40 @@ def fuzzy_match(pred: str, truth: str, threshold: float = 0.8) -> bool:
     return (intersection / union) >= threshold
 
 
+def try_parse_json(json_str: str) -> Optional[dict]:
+    """Try to parse JSON, with basic repair for common LLM errors."""
+    # First try direct parse
+    try:
+        return json.loads(json_str)
+    except json.JSONDecodeError:
+        pass
+
+    # Try fixing extra trailing braces (common LLM error)
+    # Count opening and closing braces
+    open_braces = json_str.count('{')
+    close_braces = json_str.count('}')
+    if close_braces > open_braces:
+        # Remove extra closing braces from the end
+        fixed = json_str.rstrip()
+        for _ in range(close_braces - open_braces):
+            if fixed.endswith('}'):
+                fixed = fixed[:-1].rstrip()
+        try:
+            return json.loads(fixed)
+        except json.JSONDecodeError:
+            pass
+
+    # Try fixing missing closing braces
+    if open_braces > close_braces:
+        fixed = json_str + ('}' * (open_braces - close_braces))
+        try:
+            return json.loads(fixed)
+        except json.JSONDecodeError:
+            pass
+
+    return None
+
+
 def extract_json_from_response(response: str) -> Optional[dict]:
     """Extract JSON from model response, handling various formats."""
     if not response:
@@ -632,6 +759,15 @@ def extract_json_from_response(response: str) -> Optional[dict]:
 
     # Remove thinking blocks (Qwen style)
     response = re.sub(r'<think>[\s\S]*?</think>', '', response)
+
+    # Remove special channel/message tags (GPT-OSS style: <|channel|>, <|message|>, etc.)
+    # First, try to extract just the "final" channel content if present
+    final_match = re.search(r'<\|channel\|>final<\|message\|>([\s\S]*?)(?:<\||$)', response)
+    if final_match:
+        response = final_match.group(1)
+    else:
+        # Remove all <|...|> style tags
+        response = re.sub(r'<\|[^|]*\|>', '', response)
 
     # Remove any other XML-like tags
     response = re.sub(r'<[^>]+>', '', response)
@@ -645,29 +781,53 @@ def extract_json_from_response(response: str) -> Optional[dict]:
     for pattern in code_block_patterns:
         match = re.search(pattern, response)
         if match:
-            try:
-                return json.loads(match.group(1))
-            except json.JSONDecodeError:
-                continue
+            result = try_parse_json(match.group(1))
+            if result:
+                return result
 
     # Try to find raw JSON (object starting with {)
-    # Use a more careful regex to find balanced braces
+    # First try greedy match
     json_match = re.search(r'\{[\s\S]*\}', response)
     if json_match:
-        json_str = json_match.group()
-        try:
-            return json.loads(json_str)
-        except json.JSONDecodeError:
-            # Try to fix common issues
-            # Sometimes models don't close the JSON properly
-            pass
+        result = try_parse_json(json_match.group())
+        if result:
+            return result
+
+    # If greedy failed, try to find balanced JSON by scanning for complete objects
+    # This handles cases where valid JSON is followed by garbage text
+    start_idx = response.find('{')
+    if start_idx != -1:
+        brace_count = 0
+        in_string = False
+        escape_next = False
+
+        for i, char in enumerate(response[start_idx:], start_idx):
+            if escape_next:
+                escape_next = False
+                continue
+            if char == '\\' and in_string:
+                escape_next = True
+                continue
+            if char == '"' and not escape_next:
+                in_string = not in_string
+                continue
+            if in_string:
+                continue
+
+            if char == '{':
+                brace_count += 1
+            elif char == '}':
+                brace_count -= 1
+                if brace_count == 0:
+                    # Found a complete JSON object
+                    candidate = response[start_idx:i+1]
+                    result = try_parse_json(candidate)
+                    if result:
+                        return result
+                    break
 
     # Try parsing the whole stripped response
-    response = response.strip()
-    try:
-        return json.loads(response)
-    except json.JSONDecodeError:
-        return None
+    return try_parse_json(response.strip())
 
 
 def evaluate_extraction(predicted: dict, ground_truth: dict) -> dict:
@@ -1058,27 +1218,48 @@ def generate_html_report(results_dir: Path):
     # Sort by timestamp
     results = sorted(results, key=lambda r: r.get("timestamp", ""))
 
-    # Calculate stats for template
+    # Calculate stats for template - use averages per model
     successful_results = [r for r in results if r.get("success")]
 
-    # Best F1
-    best_f1 = max((r.get("f1", 0) for r in successful_results), default=0) * 100
+    # Group results by model and calculate averages
+    model_stats = {}
+    for r in successful_results:
+        model_name = r.get("model_name")
+        if not model_name:
+            continue
+        if model_name not in model_stats:
+            model_stats[model_name] = {"f1": [], "time": [], "memory": []}
+        if r.get("f1"):
+            model_stats[model_name]["f1"].append(r["f1"])
+        if r.get("time_sec"):
+            model_stats[model_name]["time"].append(r["time_sec"])
+        if r.get("memory_delta_gb", 0) > 0:
+            model_stats[model_name]["memory"].append(r["memory_delta_gb"])
 
-    # Fastest model
-    fastest = min(successful_results, key=lambda r: r.get("time_sec", float("inf")), default=None)
-    fastest_time = fastest.get("time_sec", 0) if fastest else 0
-    fastest_model = fastest.get("model_name", "-") if fastest else "-"
-    # Shorten model name for display
-    if "/" in fastest_model:
-        fastest_model = fastest_model.split("/")[-1]
+    # Calculate averages per model
+    model_avgs = {}
+    for model_name, stats in model_stats.items():
+        model_avgs[model_name] = {
+            "avg_f1": sum(stats["f1"]) / len(stats["f1"]) if stats["f1"] else 0,
+            "avg_time": sum(stats["time"]) / len(stats["time"]) if stats["time"] else float("inf"),
+            "avg_memory": sum(stats["memory"]) / len(stats["memory"]) if stats["memory"] else float("inf"),
+        }
 
-    # Lowest memory model
-    memory_results = [r for r in successful_results if r.get("memory_delta_gb", 0) > 0]
-    lowest_mem = min(memory_results, key=lambda r: r.get("memory_delta_gb", float("inf")), default=None)
-    lowest_memory = round(lowest_mem.get("memory_delta_gb", 0), 1) if lowest_mem else 0
-    lowest_memory_model = lowest_mem.get("model_name", "-") if lowest_mem else "-"
-    if "/" in lowest_memory_model:
-        lowest_memory_model = lowest_memory_model.split("/")[-1]
+    # Best average F1
+    best_f1_model = max(model_avgs.items(), key=lambda x: x[1]["avg_f1"], default=(None, {"avg_f1": 0}))
+    best_f1 = best_f1_model[1]["avg_f1"] * 100
+    best_f1_model_name = get_short_model_name(best_f1_model[0]) if best_f1_model[0] else "-"
+
+    # Fastest average model
+    fastest_model_data = min(model_avgs.items(), key=lambda x: x[1]["avg_time"], default=(None, {"avg_time": 0}))
+    fastest_time = fastest_model_data[1]["avg_time"] if fastest_model_data[0] else 0
+    fastest_model = get_short_model_name(fastest_model_data[0]) if fastest_model_data[0] else "-"
+
+    # Lowest average memory model
+    models_with_memory = {k: v for k, v in model_avgs.items() if v["avg_memory"] < float("inf")}
+    lowest_mem_data = min(models_with_memory.items(), key=lambda x: x[1]["avg_memory"], default=(None, {"avg_memory": 0}))
+    lowest_memory = round(lowest_mem_data[1]["avg_memory"], 1) if lowest_mem_data[0] else 0
+    lowest_memory_model = get_short_model_name(lowest_mem_data[0]) if lowest_mem_data[0] else "-"
 
     # Unique models
     models_tested = len(set(r.get("model_name") for r in results if r.get("model_name")))
@@ -1102,6 +1283,7 @@ def generate_html_report(results_dir: Path):
         data_json=json.dumps(results, default=str),
         total_runs=len(results),
         best_f1=f"{best_f1:.1f}",
+        best_f1_model=best_f1_model_name,
         fastest_time=f"{fastest_time:.1f}",
         fastest_model=fastest_model,
         lowest_memory=lowest_memory,
@@ -1127,7 +1309,18 @@ def generate_html_report(results_dir: Path):
 # =============================================================================
 
 def load_config(config_path: str) -> dict:
-    """Load and validate config file."""
+    """Load and validate config file.
+
+    Args:
+        config_path: Path to the YAML config file
+
+    Returns:
+        Validated configuration dictionary
+
+    Raises:
+        ValueError: If required fields are missing or model configs are invalid
+        FileNotFoundError: If config file doesn't exist
+    """
     with open(config_path) as f:
         config = yaml.safe_load(f)
 
@@ -1135,6 +1328,13 @@ def load_config(config_path: str) -> dict:
     for field in required:
         if field not in config:
             raise ValueError(f"Missing required config field: {field}")
+
+    # Validate each model config
+    if not isinstance(config["models"], list) or len(config["models"]) == 0:
+        raise ValueError("Config 'models' must be a non-empty list")
+
+    for i, model in enumerate(config["models"]):
+        validate_model_config(model, i)
 
     if "settings" not in config:
         config["settings"] = {}
