@@ -95,33 +95,25 @@ ground_truth:
 # Fair comparison: All models are Qwen3 family with Q4 quantization
 # Memory is auto-detected from Ollama/MLX cache
 models:
-  - name: MLX - 8B
+  - name: MLX - Qwen3-8B
     model_id: mlx-community/Qwen3-8B-4bit
     backend: mlx
 
-  - name: MLX - 30B
-    model_id: mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit
-    backend: mlx
-
-  - name: Ollama - 8B
+  - name: Ollama - Qwen3-8B
     model_id: qwen3:8b
     backend: ollama
 
-  - name: Ollama - 30B
+  - name: Ollama - Qwen3Coder30B
     model_id: qwen3-coder:30b-a3b-q4_K_M
     backend: ollama
 
-  - name: MLX - Ministral 14B
-    model_id: mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4
+  - name: MLX - Hermes4-14B
+    model_id: mlx-community/Hermes-4-14B-4bit
     backend: mlx
-
-  - name: Ollama - Hermes 3 8B
-    model_id: hermes3:8b
-    backend: ollama
-
-  - name: Ollama - Qwen 2.5 14B
-    model_id: qwen2.5:14b
-    backend: ollama
+  
+  - name: MLX - GLM4
+    model_id: Narutoouz/GLM-4-9B-0414-4bit-DWQ 
+    backend: mlx
 
 # Settings
 settings:
