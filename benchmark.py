@@ -1301,7 +1301,14 @@ def generate_html_report(results_dir: Path):
     with open(report_file, "w") as f:
         f.write(html_content)
 
-    return report_file
+    # Auto-copy to docs/ for GitHub Pages
+    docs_dir = Path(__file__).parent / "docs"
+    docs_index = docs_dir / "index.html"
+    if docs_dir.is_dir():
+        import shutil
+        shutil.copy2(report_file, docs_index)
+
+    return report_file, docs_index if docs_dir.is_dir() else None
 
 
 # =============================================================================
@@ -1685,9 +1692,14 @@ def main():
     report_file = generate_report(results_dir)
     if report_file:
         print(f"  Markdown: {report_file}")
-    html_report = generate_html_report(results_dir)
-    if html_report:
+    html_result = generate_html_report(results_dir)
+    if html_result:
+        html_report, docs_copy = html_result
         print(f"  HTML:     {html_report}")
+        if docs_copy:
+            print(f"  GitHub Pages: {docs_copy}")
+        import webbrowser
+        webbrowser.open(f"file://{html_report.resolve()}")
 
     # Final summary
     print()

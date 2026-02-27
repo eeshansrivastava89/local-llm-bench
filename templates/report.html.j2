@@ -318,8 +318,8 @@
             <!-- F1 Score Ranking -->
             <div class="card animate delay-7" style="padding: 24px;">
                 <div class="mb-2">
-                    <h2 class="text-lg font-semibold text-text">F1 Score by Model</h2>
-                    <p class="text-xs text-muted mt-1">Average across all runs &middot; higher is better</p>
+                    <h2 class="text-lg font-semibold text-text">Composite Score by Model</h2>
+                    <p class="text-xs text-muted mt-1">F1 &times; speed<sup>0.3</sup> &times; confidence &middot; higher is better</p>
                 </div>
                 <div id="f1-bar-chart" style="height: 320px;"></div>
             </div>
@@ -391,6 +391,7 @@
                             <th>Memory (GB)</th>
                             <th>Tokens</th>
                             <th>F1</th>
+                            <th>Composite</th>
                             <th>Precision</th>
                             <th>Recall</th>
                             <th>Prompt</th>
@@ -466,6 +467,25 @@
         const modelColors = {};
         models.forEach((m, i) => modelColors[m] = colors[i % colors.length]);
 
+        // Pre-compute composite scores per model for table
+        const _modelRuns = {};
+        data.forEach(r => {
+            if (!r.success || !r.model_name) return;
+            if (!_modelRuns[r.model_name]) _modelRuns[r.model_name] = { f1s: [], times: [] };
+            _modelRuns[r.model_name].f1s.push(r.f1 || 0);
+            _modelRuns[r.model_name].times.push(r.time_sec || 0);
+        });
+        const _minTime = Math.min(...Object.values(_modelRuns).map(v => v.times.reduce((a, b) => a + b, 0) / v.times.length));
+        const _K = 10;
+        const compositeByModel = {};
+        Object.entries(_modelRuns).forEach(([model, v]) => {
+            const avgF1 = v.f1s.reduce((a, b) => a + b, 0) / v.f1s.length * 100;
+            const avgTime = v.times.reduce((a, b) => a + b, 0) / v.times.length;
+            const speedFactor = Math.pow(_minTime / avgTime, 0.3);
+            const confidence = Math.min(1, v.f1s.length / _K);
+            compositeByModel[model] = +(avgF1 * speedFactor * confidence).toFixed(1);
+        });
+
         // Populate table
         const tbody = document.getElementById('table-body');
         data.forEach(row => {
@@ -486,6 +506,7 @@
                 <td>${row.memory_delta_gb ? row.memory_delta_gb.toFixed(2) : '-'}</td>
                 <td>${row.tokens || '-'}</td>
                 <td class="font-medium">${f1}</td>
+                <td class="font-medium">${compositeByModel[row.model_name] ?? '-'}</td>
                 <td>${prec}</td>
                 <td>${rec}</td>
                 <td><code class="text-xs bg-bg px-1.5 py-0.5 rounded border border-border">${promptShort}</code></td>
@@ -555,17 +576,42 @@
             return s.length > 28 ? s.substring(0, 26) + '…' : s;
         }
 
-        // ── Chart 1: F1 Score Ranking (horizontal bar) ──
+        // ── Chart 1: Composite Score Ranking (horizontal bar) ──
+        // Composite = F1 × speed_factor^0.3 × confidence_factor
+        //   speed_factor = min_time / model_time (fastest = 1.0)
+        //   confidence_factor = min(1, runs / K) where K = 5
+
+        function getCompositeScores() {
+            const stats = getModelAverages();
+            const entries = Object.entries(stats).filter(([, v]) => v.avgF1 > 0);
+            const minTime = Math.min(...entries.map(([, v]) => v.avgTime));
+            const K = 10;
+
+            const scores = {};
+            entries.forEach(([model, v]) => {
+                const f1 = v.avgF1 * 100;
+                const speedFactor = Math.pow(minTime / v.avgTime, 0.3);
+                const confidence = Math.min(1, v.runs / K);
+                scores[model] = {
+                    composite: +(f1 * speedFactor * confidence).toFixed(1),
+                    f1: +f1.toFixed(1),
+                    speedFactor: +speedFactor.toFixed(2),
+                    confidence: +confidence.toFixed(2),
+                    runs: v.runs,
+                    avgTime: +v.avgTime.toFixed(1)
+                };
+            });
+            return scores;
+        }
 
         function renderF1BarChart() {
             const c = getPlotlyColors();
-            const stats = getModelAverages();
-            const sorted = Object.entries(stats)
-                .filter(([, v]) => v.avgF1 > 0)
-                .sort((a, b) => a[1].avgF1 - b[1].avgF1); // ascending for horizontal bar (bottom = best)
+            const scores = getCompositeScores();
+            const sorted = Object.entries(scores)
+                .sort((a, b) => a[1].composite - b[1].composite); // ascending for horizontal bar (bottom = best)
 
             const names = sorted.map(([m]) => shortName(m));
-            const values = sorted.map(([, v]) => +(v.avgF1 * 100).toFixed(1));
+            const values = sorted.map(([, v]) => v.composite);
             const fullNames = sorted.map(([m]) => m);
             const barColors = sorted.map(([m]) => modelColors[m]);
 
@@ -579,12 +625,13 @@
                     line: { width: 0 },
                     cornerradius: 4
                 },
-                text: values.map(v => v.toFixed(1) + '%'),
+                text: values.map(v => v.toFixed(1)),
                 textposition: 'outside',
                 textfont: { size: 11, color: c.text },
-                hovertemplate: fullNames.map((m, i) =>
-                    `<b>${m}</b><br>Avg F1: ${values[i]}%<br>Runs: ${stats[m].runs}<extra></extra>`
-                ),
+                hovertemplate: fullNames.map((m, i) => {
+                    const s = scores[m];
+                    return `<b>${m}</b><br>Composite: ${s.composite}<br>F1: ${s.f1}% &times; Speed: ${s.speedFactor} &times; Conf: ${s.confidence}<br>Avg time: ${s.avgTime}s &middot; Runs: ${s.runs}<extra></extra>`;
+                }),
                 cliponaxis: false
             };
 
@@ -592,11 +639,10 @@
                 ...baseLayout(),
                 margin: { t: 8, b: 20, l: 180, r: 60 },
                 xaxis: {
-                    range: [0, Math.min(110, Math.max(...values) * 1.15)],
+                    range: [0, Math.max(...values) * 1.15],
                     showgrid: true,
                     gridcolor: c.grid,
                     zeroline: false,
-                    ticksuffix: '%',
                     tickfont: { size: 11, color: c.muted }
                 },
                 yaxis: {
