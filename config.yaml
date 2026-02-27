@@ -92,28 +92,39 @@ ground_truth:
       due_date: "February 8"
 
 # Models to benchmark
-# Fair comparison: All models are Qwen3 family with Q4 quantization
 # Memory is auto-detected from Ollama/MLX cache
+#
+# Ollama commands:
+#   ollama pull <model>            # Download a model (e.g. ollama pull qwen3:8b)
+#   ollama list                    # List downloaded models and sizes
+#   ollama rm <model>              # Delete a model (e.g. ollama rm qwen3:8b)
+#   ollama show <model>            # Show model details (params, quantization, etc.)
+#
+# MLX commands (via mlx-lm + hf CLI):
+#   hf download <hf_repo>                 # Download a model to HF cache
+#   mlx_lm.generate --model <hf_repo>     # Download (if needed) and run a model
+#   hf cache ls --sort accessed            # List models with sizes, newest first
+#   hf cache rm <repo_id>                 # Delete a cached model
+#   hf cache prune                         # Remove detached/orphaned revisions
+
 models:
-  - name: MLX - Qwen3-8B
-    model_id: mlx-community/Qwen3-8B-4bit
+  - model_id: mlx-community/Qwen3-8B-4bit
     backend: mlx
 
-  - name: Ollama - Qwen3-8B
-    model_id: qwen3:8b
+  - model_id: qwen3:8b
     backend: ollama
 
-  - name: Ollama - Qwen3Coder30B
-    model_id: qwen3-coder:30b-a3b-q4_K_M
-    backend: ollama
+  - model_id: lmstudio-community/GLM-4.7-Flash-MLX-6bit
+    backend: mlx
 
-  - name: MLX - Hermes4-14B
-    model_id: mlx-community/Hermes-4-14B-4bit
+  - model_id: Narutoouz/GLM-4-9B-0414-4bit-DWQ
     backend: mlx
-  
-  - name: MLX - GLM4
-    model_id: Narutoouz/GLM-4-9B-0414-4bit-DWQ 
+
+  - model_id: mlx-community/Qwen3.5-35B-A3B-4bit
     backend: mlx
+
+  - model_id: qwen3.5:35b-a3b
+    backend: ollama
 
 # Settings
 settings:

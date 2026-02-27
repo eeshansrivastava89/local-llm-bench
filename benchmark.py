@@ -84,7 +84,7 @@ def validate_model_config(model: dict, index: int) -> None:
     Raises:
         ValueError: If required fields are missing or invalid
     """
-    required_fields = ["name", "model_id", "backend"]
+    required_fields = ["model_id", "backend"]
     for field in required_fields:
         if field not in model:
             raise ValueError(f"Model {index + 1} missing required field: {field}")
@@ -119,16 +119,16 @@ def get_prompt_hash(prompt: str) -> str:
     return hashlib.sha256(prompt.encode()).hexdigest()[:8]
 
 
-def get_short_model_name(name: str) -> str:
-    """Get short model name (last part after /).
+def get_display_name(model: dict) -> str:
+    """Derive display name from backend and model_id.
 
     Args:
-        name: Full model name, possibly with org prefix
+        model: Model configuration dictionary with 'backend' and 'model_id'
 
     Returns:
-        Short name without org prefix
+        Display name in 'backend/model_id' format
     """
-    return name.split("/")[-1] if "/" in name else name
+    return f"{model['backend']}/{model['model_id']}"
 
 
 def save_prompt_if_new(results_dir: Path, prompt: str) -> str:
@@ -1121,7 +1121,7 @@ def save_response(
     responses_dir.mkdir(parents=True, exist_ok=True)
 
     # Create filename with timestamp and model name
-    safe_name = sanitize_filename(model_config["name"])
+    safe_name = sanitize_filename(get_display_name(model_config))
     timestamp_safe = timestamp.replace(":", "-")
     response_file = responses_dir / f"{safe_name}_{timestamp_safe}.txt"
 
@@ -1248,18 +1248,18 @@ def generate_html_report(results_dir: Path):
     # Best average F1
     best_f1_model = max(model_avgs.items(), key=lambda x: x[1]["avg_f1"], default=(None, {"avg_f1": 0}))
     best_f1 = best_f1_model[1]["avg_f1"] * 100
-    best_f1_model_name = get_short_model_name(best_f1_model[0]) if best_f1_model[0] else "-"
+    best_f1_model_name = best_f1_model[0] if best_f1_model[0] else "-"
 
     # Fastest average model
     fastest_model_data = min(model_avgs.items(), key=lambda x: x[1]["avg_time"], default=(None, {"avg_time": 0}))
     fastest_time = fastest_model_data[1]["avg_time"] if fastest_model_data[0] else 0
-    fastest_model = get_short_model_name(fastest_model_data[0]) if fastest_model_data[0] else "-"
+    fastest_model = fastest_model_data[0] if fastest_model_data[0] else "-"
 
     # Lowest average memory model
     models_with_memory = {k: v for k, v in model_avgs.items() if v["avg_memory"] < float("inf")}
     lowest_mem_data = min(models_with_memory.items(), key=lambda x: x[1]["avg_memory"], default=(None, {"avg_memory": 0}))
     lowest_memory = round(lowest_mem_data[1]["avg_memory"], 1) if lowest_mem_data[0] else 0
-    lowest_memory_model = get_short_model_name(lowest_mem_data[0]) if lowest_mem_data[0] else "-"
+    lowest_memory_model = lowest_mem_data[0] if lowest_mem_data[0] else "-"
 
     # Unique models
     models_tested = len(set(r.get("model_name") for r in results if r.get("model_name")))
@@ -1370,10 +1370,11 @@ def prompt_model_selection(models: list[dict], settings: dict, results_dir: Path
         estimated = estimate_model_memory_gb(model)
         fit_indicator = get_memory_fit_indicator(estimated, available_gb, buffer_gb)
 
-        last_run = get_last_run_time(results_dir, model["name"])
+        display = get_display_name(model)
+        last_run = get_last_run_time(results_dir, display)
         last_run_info = f" (last: {last_run})" if last_run else ""
 
-        print(f"  [{i}] {model['name']:<20} ({estimated:.0f} GB required)  {fit_indicator}{last_run_info}")
+        print(f"  [{i}] {display:<40} ({estimated:.0f} GB required)  {fit_indicator}{last_run_info}")
 
     print("\n  [0] Cancel\n")
 
@@ -1408,7 +1409,7 @@ def run_single_benchmark(
 
     print()
     print("=" * 60)
-    print(f"Running: {selected_model['name']}")
+    print(f"Running: {get_display_name(selected_model)}")
     print(f"Output:  {results_dir}")
     print("=" * 60)
 
@@ -1519,7 +1520,7 @@ def run_single_benchmark(
     # Build CSV row
     csv_row = {
         "timestamp": run_timestamp,
-        "model_name": selected_model["name"],
+        "model_name": get_display_name(selected_model),
         "model_id": selected_model["model_id"],
         "backend": selected_model["backend"],
         "prompt_hash": prompt_hash,
@@ -1552,7 +1553,7 @@ def run_single_benchmark(
     # Summary of this run
     print()
     print("-" * 60)
-    print(f"Model:    {selected_model['name']}")
+    print(f"Model:    {get_display_name(selected_model)}")
     print(f"Backend:  {selected_model['backend']}")
     print(f"Time:     {benchmark_result['time_seconds']:.1f}s")
     print(f"Memory Δ: {memory_delta_gb:.1f} GB")
