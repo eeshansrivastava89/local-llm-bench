@@ -117,8 +117,8 @@ models:
   - model_id: lmstudio-community/GLM-4.7-Flash-MLX-6bit
     backend: mlx
 
-  - model_id: Narutoouz/GLM-4-9B-0414-4bit-DWQ
-    backend: mlx
+  # - model_id: Narutoouz/GLM-4-9B-0414-4bit-DWQ
+  #   backend: mlx
 
   - model_id: mlx-community/Qwen3.5-35B-A3B-4bit
     backend: mlx

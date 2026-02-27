@@ -41,52 +41,118 @@
 
     <style>
         :root {
-            --bg: #f5f5f5;
+            --bg: #f5f5f7;
             --surface: #ffffff;
-            --border: #e5e5e5;
-            --text: #171717;
-            --muted: #737373;
+            --border: #d2d2d7;
+            --text: #1d1d1f;
+            --muted: #86868b;
+            --accent: #f97316;
+            --accent-light: #fff7ed;
+            --success: #34c759;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.08);
+            --radius: 16px;
+            --radius-sm: 10px;
         }
         .dark {
-            --bg: #0a0a0a;
-            --surface: #171717;
-            --border: #262626;
-            --text: #e5e5e5;
-            --muted: #737373;
+            --bg: #000000;
+            --surface: #1c1c1e;
+            --border: #38383a;
+            --text: #f5f5f7;
+            --muted: #86868b;
+            --accent-light: #1a1207;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate { animation: fadeIn 0.4s ease forwards; }
+        .delay-1 { animation-delay: 0.05s; opacity: 0; }
+        .delay-2 { animation-delay: 0.1s; opacity: 0; }
+        .delay-3 { animation-delay: 0.15s; opacity: 0; }
+        .delay-4 { animation-delay: 0.2s; opacity: 0; }
+        .delay-5 { animation-delay: 0.25s; opacity: 0; }
+        .delay-6 { animation-delay: 0.3s; opacity: 0; }
+        .delay-7 { animation-delay: 0.35s; opacity: 0; }
+        .delay-8 { animation-delay: 0.4s; opacity: 0; }
+
+        /* Card system */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Stat values */
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.1;
+        }
+        .stat-label {
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .stat-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 2px;
         }
 
         /* DataTable overrides */
         .datatable-wrapper .datatable-search input {
             padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
+            border-radius: var(--radius-sm);
             border: 1px solid var(--border);
             background: var(--surface);
             color: var(--text);
             font-size: 0.875rem;
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
         .datatable-wrapper .datatable-search input:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
         }
         .datatable-wrapper .datatable-top,
         .datatable-wrapper .datatable-bottom {
             padding: 0.75rem 0;
         }
         .datatable-wrapper .datatable-selector {
-            padding: 0.375rem 0.5rem;
+            padding: 0.5rem 0.625rem;
             border-radius: 0.375rem;
             border: 1px solid var(--border);
             background: var(--surface);
             color: var(--text);
         }
+        .datatable-wrapper .datatable-selector:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
+            outline: none;
+        }
         .datatable-wrapper .datatable-pagination .datatable-pagination-list-item-link {
             padding: 0.375rem 0.75rem;
             border-radius: 0.375rem;
             color: var(--text);
+            transition: background-color 0.15s;
         }
         .datatable-wrapper .datatable-pagination .datatable-pagination-list-item.datatable-active .datatable-pagination-list-item-link {
-            background-color: #6366f1;
+            background-color: #f97316;
             color: white;
         }
         .datatable-wrapper .datatable-info {
@@ -94,8 +160,11 @@
         }
 
         /* Table styling */
+        table.dataTable tbody tr {
+            transition: background-color 0.15s;
+        }
         table.dataTable tbody tr:hover {
-            background-color: var(--bg);
+            background-color: var(--accent-light);
         }
         table.dataTable th {
             background-color: var(--bg);
@@ -111,6 +180,23 @@
         }
         table.dataTable td {
             color: var(--text);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Select styling */
+        select.filter-select {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            background: var(--surface);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        select.filter-select:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
         }
     </style>
 </head>
@@ -145,10 +231,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
 
         <!-- Page Header -->
-        <div class="mb-8">
+        <div class="mb-8 animate delay-1">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-400 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
@@ -159,18 +245,18 @@
                     </div>
                 </div>
                 <div class="text-right">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-surface border border-border text-text">
-                        50 runs
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-surface border border-border text-text shadow-sm">
+                        62 runs
                     </span>
                 </div>
             </div>
 
             <!-- System Info Bar -->
-            <div class="bg-surface/50 rounded-lg border border-border p-4 mb-4">
+            <div class="card animate delay-2 mb-4">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                         <p class="text-muted text-xs uppercase tracking-wide mb-1">System</p>
-                        <p class="text-text font-medium">macOS 26.2</p>
+                        <p class="text-text font-medium">macOS 26.3</p>
                     </div>
                     <div>
                         <p class="text-muted text-xs uppercase tracking-wide mb-1">CPU</p>
@@ -193,86 +279,106 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Last run: 2026-02-16 20:30
+                    Last run: 2026-02-27 10:18
                 </span>
                 <span class="flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                     </svg>
-                    Models tested: 12
+                    Models tested: 10
                 </span>
             </div>
         </div>
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Total Runs</p>
-                <p class="text-2xl font-semibold text-text mt-1">50</p>
+            <div class="card animate delay-3">
+                <p class="stat-label">Total Runs</p>
+                <p class="stat-value mt-2" style="color: #f97316;">62</p>
             </div>
-            <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Best Avg F1</p>
-                <p class="text-2xl font-semibold text-emerald-500 mt-1">98.8%</p>
-                <p class="text-xs text-muted mt-0.5">MLX - Qwen3-8B</p>
+            <div class="card animate delay-4">
+                <p class="stat-label">Best Avg F1</p>
+                <p class="stat-value mt-2" style="color: #34c759;">98.8%</p>
+                <p class="stat-sub">mlx/mlx-community/Qwen3-8B-4bit</p>
             </div>
-            <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Fastest Avg</p>
-                <p class="text-2xl font-semibold text-indigo-500 mt-1">7.1s</p>
-                <p class="text-xs text-muted mt-0.5">MLX - Qwen3Coder30B</p>
+            <div class="card animate delay-5">
+                <p class="stat-label">Fastest Avg</p>
+                <p class="stat-value mt-2" style="color: #06b6d4;">7.1s</p>
+                <p class="stat-sub">mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit</p>
             </div>
-            <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Lowest Avg Memory</p>
-                <p class="text-2xl font-semibold text-violet-500 mt-1">4.4 GB</p>
-                <p class="text-xs text-muted mt-0.5">MLX - Qwen3-8B</p>
+            <div class="card animate delay-6">
+                <p class="stat-label">Lowest Avg Memory</p>
+                <p class="stat-value mt-2" style="color: #8b5cf6;">2.8 GB</p>
+                <p class="stat-sub">mlx/Narutoouz/GLM-4-9B-0414-4bit-DWQ</p>
             </div>
         </div>
 
-        <!-- Charts Grid -->
+        <!-- Charts Row 1 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- F1 Score Ranking -->
+            <div class="card animate delay-7" style="padding: 24px;">
+                <div class="mb-2">
+                    <h2 class="text-lg font-semibold text-text">Composite Score by Model</h2>
+                    <p class="text-xs text-muted mt-1">F1 &times; speed<sup>0.3</sup> &times; confidence &middot; higher is better</p>
+                </div>
+                <div id="f1-bar-chart" style="height: 320px;"></div>
+            </div>
+
+            <!-- Speed vs Quality Bubble -->
+            <div class="card animate delay-8" style="padding: 24px;">
+                <div class="mb-2">
+                    <h2 class="text-lg font-semibold text-text">Speed vs Quality</h2>
+                    <p class="text-xs text-muted mt-1">Bubble size = memory &middot; top-left is ideal</p>
+                </div>
+                <div id="bubble-chart" style="height: 320px;"></div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Time Series Chart -->
-            <div class="bg-surface rounded-xl border border-border p-5">
-                <div class="flex items-center justify-between mb-4">
+            <!-- Metrics Over Time -->
+            <div class="card animate delay-7" style="padding: 24px;">
+                <div class="flex items-center justify-between mb-3">
                     <h2 class="text-lg font-semibold text-text">Metrics Over Time</h2>
                 </div>
-                <div class="flex items-center gap-4 mb-4">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
                     <div class="flex items-center gap-1.5">
                         <label for="metric-select" class="text-xs font-medium text-muted">Metric:</label>
-                        <select id="metric-select" onchange="updateCharts()" class="w-28 px-2 py-1 text-xs border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <select id="metric-select" onchange="updateTimeChart()" class="filter-select w-28">
                             <option value="f1">F1 Score</option>
                             <option value="time_sec">Time (s)</option>
                             <option value="memory_delta_gb">Memory (GB)</option>
                             <option value="tokens">Tokens</option>
-                            <option value="completion_tokens">Completion</option>
                         </select>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <label for="model-select" class="text-xs font-medium text-muted">Model:</label>
-                        <select id="model-select" onchange="updateCharts()" class="w-28 px-2 py-1 text-xs border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <select id="model-select" onchange="updateTimeChart()" class="filter-select w-28">
                             <option value="all">All</option>
                         </select>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <label for="prompt-select" class="text-xs font-medium text-muted">Prompt:</label>
-                        <select id="prompt-select" onchange="updateCharts()" class="w-24 px-2 py-1 text-xs border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono">
+                        <select id="prompt-select" onchange="updateTimeChart()" class="filter-select w-24 font-mono">
                             <option value="all">All</option>
                         </select>
                     </div>
                 </div>
-                <div id="main-chart" class="h-80"></div>
+                <div id="time-chart" style="height: 280px;"></div>
             </div>
 
-            <!-- Bubble Chart -->
-            <div class="bg-surface rounded-xl border border-border p-5">
-                <div class="mb-4">
-                    <h2 class="text-lg font-semibold text-text">Model Comparison</h2>
-                    <p class="text-sm text-muted mt-1">Bubble size = memory usage</p>
+            <!-- Resource Usage -->
+            <div class="card animate delay-8" style="padding: 24px;">
+                <div class="mb-2">
+                    <h2 class="text-lg font-semibold text-text">Resource Usage</h2>
+                    <p class="text-xs text-muted mt-1">Average time &amp; memory per model</p>
                 </div>
-                <div id="bubble-chart" class="h-80"></div>
+                <div id="resource-chart" style="height: 320px;"></div>
             </div>
         </div>
 
         <!-- Results Table -->
-        <div class="bg-surface rounded-xl border border-border p-5">
+        <div class="card animate delay-8" style="padding: 24px;">
             <h2 class="text-lg font-semibold text-text mb-4">All Results</h2>
             <div class="overflow-x-auto">
                 <table id="results-table" class="w-full">
@@ -285,6 +391,7 @@
                             <th>Memory (GB)</th>
                             <th>Tokens</th>
                             <th>F1</th>
+                            <th>Composite</th>
                             <th>Precision</th>
                             <th>Recall</th>
                             <th>Prompt</th>
@@ -328,12 +435,10 @@
         themeToggle.addEventListener('click', () => {
             html.classList.toggle('dark');
             localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-            // Re-render charts with new theme
-            updateCharts();
-            renderBubbleChart();
+            renderAllCharts();
         });
 
-        const data = [{"timestamp": "2026-01-24T18:21:33.241406", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.98, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 0.73, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:28:41.725738", "model_name": "MLX - Qwen3Coder30B", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.71, "tokens": 942.0, "prompt_tokens": 531.0, "completion_tokens": 411.0, "memory_delta_gb": 4.13, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:31:04.477867", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 93.03, "tokens": 4027.0, "prompt_tokens": 533.0, "completion_tokens": 3494.0, "memory_delta_gb": 15.33, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:31:55.472020", "model_name": "Ollama - Qwen3Coder30B", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 31.98, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 22.46, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:47:09.304236", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.9, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.35, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:48:55.350670", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 78.3, "tokens": 3487.0, "prompt_tokens": 533.0, "completion_tokens": 2954.0, "memory_delta_gb": 14.93, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:50:10.090093", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.8, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.03, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:50:27.437381", "model_name": "MLX - Qwen3Coder30B", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.13, "tokens": 951.0, "prompt_tokens": 531.0, "completion_tokens": 420.0, "memory_delta_gb": 14.55, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:52:11.275461", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 99.54, "tokens": 4266.0, "prompt_tokens": 533.0, "completion_tokens": 3733.0, "memory_delta_gb": 15.04, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:52:46.168135", "model_name": "Ollama - Qwen3Coder30B", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 30.66, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 24.83, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T21:59:03.200373", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 11.01, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 4.42, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T22:01:52.198885", "model_name": "MLX - Qwen3Coder30B", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 7.91, "tokens": 994.0, "prompt_tokens": 531.0, "completion_tokens": 463.0, "memory_delta_gb": 9.2, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T22:03:35.440295", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 98.89, "tokens": 4237.0, "prompt_tokens": 533.0, "completion_tokens": 3704.0, "memory_delta_gb": 15.51, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T22:18:19.120314", "model_name": "Ollama - Qwen3Coder30B", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 33.01, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 19.74, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T23:38:52.364965", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.96, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 6.16, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T23:39:10.249581", "model_name": "MLX - Qwen3Coder30B", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.62, "tokens": 933.0, "prompt_tokens": 531.0, "completion_tokens": 402.0, "memory_delta_gb": 15.33, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T23:39:45.181060", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 30.58, "tokens": 1620.0, "prompt_tokens": 533.0, "completion_tokens": 1087.0, "memory_delta_gb": 15.13, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T23:41:00.050920", "model_name": "Ollama - Qwen3Coder30B", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 31.83, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 22.25, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:06:53.863240", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.73, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 2.75, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:07:14.597011", "model_name": "MLX - Qwen3Coder30B", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.4, "tokens": 968.0, "prompt_tokens": 531.0, "completion_tokens": 437.0, "memory_delta_gb": 4.64, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:07:52.718958", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 33.81, "tokens": 1846.0, "prompt_tokens": 533.0, "completion_tokens": 1313.0, "memory_delta_gb": 14.95, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:08:25.167342", "model_name": "Ollama - Qwen3Coder30B", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 24.52, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 23.37, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:09:45.135670", "model_name": "MLX - Ministral 14B", "model_id": "mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 21.47, "tokens": 1619.0, "prompt_tokens": 1065.0, "completion_tokens": 554.0, "memory_delta_gb": 8.38, "f1": 0.8421, "precision": 0.9697, "recall": 0.7442, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:19:48.821723", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.77, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.45, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:20:06.405951", "model_name": "MLX - Qwen3Coder30B", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.35, "tokens": 968.0, "prompt_tokens": 531.0, "completion_tokens": 437.0, "memory_delta_gb": 15.39, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:21:25.620530", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 74.95, "tokens": 3418.0, "prompt_tokens": 533.0, "completion_tokens": 2885.0, "memory_delta_gb": 15.31, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:21:56.694615", "model_name": "Ollama - Qwen3Coder30B", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 26.9, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 24.68, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:24:23.071131", "model_name": "MLX - Ministral 14B", "model_id": "mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 22.16, "tokens": 1636.0, "prompt_tokens": 1065.0, "completion_tokens": 571.0, "memory_delta_gb": 7.93, "f1": 0.8421, "precision": 0.9697, "recall": 0.7442, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:37:32.328485", "model_name": "Ollama - Hermes 3 8B", "model_id": "hermes3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 19.99, "tokens": 1015.0, "prompt_tokens": 521.0, "completion_tokens": 494.0, "memory_delta_gb": 19.76, "f1": 0.825, "precision": 0.8919, "recall": 0.7674, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:38:03.043804", "model_name": "Ollama - Qwen 2.5 14B", "model_id": "qwen2.5:14b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 22.94, "tokens": 1037.0, "prompt_tokens": 552.0, "completion_tokens": 485.0, "memory_delta_gb": 13.01, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:33:52.239300", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 11.26, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 4.44, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:36:51.177853", "model_name": "MLX - Qwen3Coder30B", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 7.43, "tokens": 934.0, "prompt_tokens": 531.0, "completion_tokens": 403.0, "memory_delta_gb": 6.71, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:37:22.215960", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.88, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.98, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:37:44.392058", "model_name": "MLX - Qwen3Coder30B", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 7.31, "tokens": 942.0, "prompt_tokens": 531.0, "completion_tokens": 411.0, "memory_delta_gb": 16.03, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:39:10.270300", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 81.56, "tokens": 3758.0, "prompt_tokens": 533.0, "completion_tokens": 3225.0, "memory_delta_gb": 15.05, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:40:09.864280", "model_name": "Ollama - Qwen3Coder30B", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 49.59, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 17.06, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:40:40.935698", "model_name": "MLX - Ministral 14B", "model_id": "mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 21.76, "tokens": 1619.0, "prompt_tokens": 1065.0, "completion_tokens": 554.0, "memory_delta_gb": 9.61, "f1": 0.8421, "precision": 0.9697, "recall": 0.7442, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:41:00.409927", "model_name": "Ollama - Hermes 3 8B", "model_id": "hermes3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 15.29, "tokens": 1041.0, "prompt_tokens": 521.0, "completion_tokens": 520.0, "memory_delta_gb": 22.37, "f1": 0.8675, "precision": 0.9, "recall": 0.8372, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:41:30.280132", "model_name": "Ollama - Qwen 2.5 14B", "model_id": "qwen2.5:14b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 25.72, "tokens": 1037.0, "prompt_tokens": 552.0, "completion_tokens": 485.0, "memory_delta_gb": 14.79, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:06:17.572683", "model_name": "MLX - Qwen3-8B", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 11.22, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 3.89, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:06:41.950708", "model_name": "MLX - Qwen3Coder30B", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 8.74, "tokens": 997.0, "prompt_tokens": 531.0, "completion_tokens": 466.0, "memory_delta_gb": 11.54, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:08:14.656157", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 88.2, "tokens": 3992.0, "prompt_tokens": 533.0, "completion_tokens": 3459.0, "memory_delta_gb": 15.47, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:08:18.898546", "model_name": "Ollama - Qwen3Coder30B", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 0.0, "tokens": 0.0, "prompt_tokens": 0.0, "completion_tokens": 0.0, "memory_delta_gb": -0.2, "f1": "", "precision": "", "recall": "", "json_valid": false, "success": false, "error": "HTTP 404: Not Found\n{\"error\":{\"message\":\"model 'qwen3-coder:30b-a3b-q4_K_M' not found\",\"type\":\"api_error\",\"param\":null,\"code\":null}}"}, {"timestamp": "2026-02-16T20:08:49.867377", "model_name": "MLX - Ministral14B", "model_id": "mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 21.77, "tokens": 1619.0, "prompt_tokens": 1065.0, "completion_tokens": 554.0, "memory_delta_gb": 4.67, "f1": 0.8421, "precision": 0.9697, "recall": 0.7442, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:09:18.221712", "model_name": "Ollama - Hermes38B", "model_id": "hermes3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 23.99, "tokens": 1030.0, "prompt_tokens": 521.0, "completion_tokens": 509.0, "memory_delta_gb": 17.53, "f1": 0.8537, "precision": 0.8974, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:09:22.486608", "model_name": "Ollama - Qwen2.514B", "model_id": "qwen2.5:14b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 0.0, "tokens": 0.0, "prompt_tokens": 0.0, "completion_tokens": 0.0, "memory_delta_gb": 0.01, "f1": "", "precision": "", "recall": "", "json_valid": false, "success": false, "error": "HTTP 404: Not Found\n{\"error\":{\"message\":\"model 'qwen2.5:14b' not found\",\"type\":\"api_error\",\"param\":null,\"code\":null}}2026-02-16T20:22:33.219137", "null": ["MLX - Qwen3-8B", "mlx-community/Qwen3-8B-4bit", "mlx", "a7738a49", "/no_think Extract information from the following meeting tra", "0.3", "8192", "11.16", "1026", "531", "495", "2.0", "0.9882", "1.0", "0.9767", "True", "True", ""]}, {"timestamp": "2026-02-16T20:23:57.227629", "model_name": "Ollama - Qwen3-8B", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 79.69, "tokens": 3661.0, "prompt_tokens": 533.0, "completion_tokens": 3128.0, "memory_delta_gb": 7.89, "f1": 0.9512, "precision": 1.0, "recall": 0.907, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:24:01.476747", "model_name": "Ollama - Qwen3Coder30B", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 0.01, "tokens": 0.0, "prompt_tokens": 0.0, "completion_tokens": 0.0, "memory_delta_gb": 0.07, "f1": "", "precision": "", "recall": "", "json_valid": false, "success": false, "error": "HTTP 404: Not Found\n{\"error\":{\"message\":\"model 'qwen3-coder:30b-a3b-q4_K_M' not found\",\"type\":\"api_error\",\"param\":null,\"code\":null}}\n"}, {"timestamp": "2026-02-16T20:30:00.859582", "model_name": "MLX - Hermes4-14B", "model_id": "mlx-community/Hermes-4-14B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 350.19, "tokens": 8737.0, "prompt_tokens": 545.0, "completion_tokens": 8192.0, "memory_delta_gb": 20.03, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:30:23.798294", "model_name": "MLX - GLM4", "model_id": "Narutoouz/GLM-4-9B-0414-4bit-DWQ", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 13.15, "tokens": 1002.0, "prompt_tokens": 517.0, "completion_tokens": 485.0, "memory_delta_gb": 7.86, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}];
+        const data = [{"timestamp": "2026-01-24T18:21:33.241406", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.98, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 0.73, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:28:41.725738", "model_name": "mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.71, "tokens": 942.0, "prompt_tokens": 531.0, "completion_tokens": 411.0, "memory_delta_gb": 4.13, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:31:04.477867", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 93.03, "tokens": 4027.0, "prompt_tokens": 533.0, "completion_tokens": 3494.0, "memory_delta_gb": 15.33, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:31:55.472020", "model_name": "ollama/qwen3-coder:30b-a3b-q4_K_M", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 31.98, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 22.46, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:47:09.304236", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.9, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.35, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:48:55.350670", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 78.3, "tokens": 3487.0, "prompt_tokens": 533.0, "completion_tokens": 2954.0, "memory_delta_gb": 14.93, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:50:10.090093", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.8, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.03, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:50:27.437381", "model_name": "mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.13, "tokens": 951.0, "prompt_tokens": 531.0, "completion_tokens": 420.0, "memory_delta_gb": 14.55, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:52:11.275461", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 99.54, "tokens": 4266.0, "prompt_tokens": 533.0, "completion_tokens": 3733.0, "memory_delta_gb": 15.04, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T18:52:46.168135", "model_name": "ollama/qwen3-coder:30b-a3b-q4_K_M", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 30.66, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 24.83, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T21:59:03.200373", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 11.01, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 4.42, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T22:01:52.198885", "model_name": "mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 7.91, "tokens": 994.0, "prompt_tokens": 531.0, "completion_tokens": 463.0, "memory_delta_gb": 9.2, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T22:03:35.440295", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 98.89, "tokens": 4237.0, "prompt_tokens": 533.0, "completion_tokens": 3704.0, "memory_delta_gb": 15.51, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T22:18:19.120314", "model_name": "ollama/qwen3-coder:30b-a3b-q4_K_M", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 33.01, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 19.74, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T23:38:52.364965", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.96, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 6.16, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T23:39:10.249581", "model_name": "mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.62, "tokens": 933.0, "prompt_tokens": 531.0, "completion_tokens": 402.0, "memory_delta_gb": 15.33, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T23:39:45.181060", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 30.58, "tokens": 1620.0, "prompt_tokens": 533.0, "completion_tokens": 1087.0, "memory_delta_gb": 15.13, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-24T23:41:00.050920", "model_name": "ollama/qwen3-coder:30b-a3b-q4_K_M", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 31.83, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 22.25, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:06:53.863240", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.73, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 2.75, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:07:14.597011", "model_name": "mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.4, "tokens": 968.0, "prompt_tokens": 531.0, "completion_tokens": 437.0, "memory_delta_gb": 4.64, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:07:52.718958", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 33.81, "tokens": 1846.0, "prompt_tokens": 533.0, "completion_tokens": 1313.0, "memory_delta_gb": 14.95, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:08:25.167342", "model_name": "ollama/qwen3-coder:30b-a3b-q4_K_M", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 24.52, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 23.37, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:09:45.135670", "model_name": "mlx/mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "model_id": "mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 21.47, "tokens": 1619.0, "prompt_tokens": 1065.0, "completion_tokens": 554.0, "memory_delta_gb": 8.38, "f1": 0.8421, "precision": 0.9697, "recall": 0.7442, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:19:48.821723", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.77, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.45, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:20:06.405951", "model_name": "mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 6.35, "tokens": 968.0, "prompt_tokens": 531.0, "completion_tokens": 437.0, "memory_delta_gb": 15.39, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:21:25.620530", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 74.95, "tokens": 3418.0, "prompt_tokens": 533.0, "completion_tokens": 2885.0, "memory_delta_gb": 15.31, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:21:56.694615", "model_name": "ollama/qwen3-coder:30b-a3b-q4_K_M", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 26.9, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 24.68, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:24:23.071131", "model_name": "mlx/mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "model_id": "mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 22.16, "tokens": 1636.0, "prompt_tokens": 1065.0, "completion_tokens": 571.0, "memory_delta_gb": 7.93, "f1": 0.8421, "precision": 0.9697, "recall": 0.7442, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:37:32.328485", "model_name": "ollama/hermes3:8b", "model_id": "hermes3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 19.99, "tokens": 1015.0, "prompt_tokens": 521.0, "completion_tokens": 494.0, "memory_delta_gb": 19.76, "f1": 0.825, "precision": 0.8919, "recall": 0.7674, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-25T00:38:03.043804", "model_name": "ollama/qwen2.5:14b", "model_id": "qwen2.5:14b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 22.94, "tokens": 1037.0, "prompt_tokens": 552.0, "completion_tokens": 485.0, "memory_delta_gb": 13.01, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:33:52.239300", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 11.26, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 4.44, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:36:51.177853", "model_name": "mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 7.43, "tokens": 934.0, "prompt_tokens": 531.0, "completion_tokens": 403.0, "memory_delta_gb": 6.71, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:37:22.215960", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.88, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.98, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:37:44.392058", "model_name": "mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 7.31, "tokens": 942.0, "prompt_tokens": 531.0, "completion_tokens": 411.0, "memory_delta_gb": 16.03, "f1": 0.8974, "precision": 1.0, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:39:10.270300", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 81.56, "tokens": 3758.0, "prompt_tokens": 533.0, "completion_tokens": 3225.0, "memory_delta_gb": 15.05, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:40:09.864280", "model_name": "ollama/qwen3-coder:30b-a3b-q4_K_M", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 49.59, "tokens": 1046.0, "prompt_tokens": 531.0, "completion_tokens": 515.0, "memory_delta_gb": 17.06, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:40:40.935698", "model_name": "mlx/mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "model_id": "mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 21.76, "tokens": 1619.0, "prompt_tokens": 1065.0, "completion_tokens": 554.0, "memory_delta_gb": 9.61, "f1": 0.8421, "precision": 0.9697, "recall": 0.7442, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:41:00.409927", "model_name": "ollama/hermes3:8b", "model_id": "hermes3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 15.29, "tokens": 1041.0, "prompt_tokens": 521.0, "completion_tokens": 520.0, "memory_delta_gb": 22.37, "f1": 0.8675, "precision": 0.9, "recall": 0.8372, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-01-30T22:41:30.280132", "model_name": "ollama/qwen2.5:14b", "model_id": "qwen2.5:14b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 25.72, "tokens": 1037.0, "prompt_tokens": 552.0, "completion_tokens": 485.0, "memory_delta_gb": 14.79, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:06:17.572683", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 11.22, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 3.89, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:06:41.950708", "model_name": "mlx/mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "model_id": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 8.74, "tokens": 997.0, "prompt_tokens": 531.0, "completion_tokens": 466.0, "memory_delta_gb": 11.54, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:08:14.656157", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 88.2, "tokens": 3992.0, "prompt_tokens": 533.0, "completion_tokens": 3459.0, "memory_delta_gb": 15.47, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:08:18.898546", "model_name": "ollama/qwen3-coder:30b-a3b-q4_K_M", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 0.0, "tokens": 0.0, "prompt_tokens": 0.0, "completion_tokens": 0.0, "memory_delta_gb": -0.2, "f1": "", "precision": "", "recall": "", "json_valid": false, "success": false, "error": "HTTP 404: Not Found\n{\"error\":{\"message\":\"model 'qwen3-coder:30b-a3b-q4_K_M' not found\",\"type\":\"api_error\",\"param\":null,\"code\":null}}"}, {"timestamp": "2026-02-16T20:08:49.867377", "model_name": "mlx/mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "model_id": "mlx-community/mistralai_Ministral-3-14B-Instruct-2512-MLX-MXFP4", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 21.77, "tokens": 1619.0, "prompt_tokens": 1065.0, "completion_tokens": 554.0, "memory_delta_gb": 4.67, "f1": 0.8421, "precision": 0.9697, "recall": 0.7442, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:09:18.221712", "model_name": "ollama/hermes3:8b", "model_id": "hermes3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 23.99, "tokens": 1030.0, "prompt_tokens": 521.0, "completion_tokens": 509.0, "memory_delta_gb": 17.53, "f1": 0.8537, "precision": 0.8974, "recall": 0.814, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-16T20:09:22.486608", "model_name": "ollama/qwen2.5:14b", "model_id": "qwen2.5:14b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 0.0, "tokens": 0.0, "prompt_tokens": 0.0, "completion_tokens": 0.0, "memory_delta_gb": 0.01, "f1": "", "precision": "", "recall": "", "json_valid": false, "success": false, "error": "HTTP 404: Not Found\n{\"error\":{\"message\":\"model 'qwen2.5:14b' not found\",\"type\":\"api_error\",\"param\":null,\"code\":null}}"}, {"timestamp": "2026-02-27T00:19:46.783735", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 12.62, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 2.39, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T00:20:20.877505", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 29.81, "tokens": 1531.0, "prompt_tokens": 533.0, "completion_tokens": 998.0, "memory_delta_gb": 8.63, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T00:20:25.048982", "model_name": "ollama/qwen3-coder:30b-a3b-q4_K_M", "model_id": "qwen3-coder:30b-a3b-q4_K_M", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 0.0, "tokens": 0.0, "prompt_tokens": 0.0, "completion_tokens": 0.0, "memory_delta_gb": 0.1, "f1": "", "precision": "", "recall": "", "json_valid": false, "success": false, "error": "HTTP 404: Not Found\n{\"error\":{\"message\":\"model 'qwen3-coder:30b-a3b-q4_K_M' not found\",\"type\":\"api_error\",\"param\":null,\"code\":null}}\n"}, {"timestamp": "2026-02-27T00:21:43.545477", "model_name": "mlx/Narutoouz/GLM-4-9B-0414-4bit-DWQ", "model_id": "Narutoouz/GLM-4-9B-0414-4bit-DWQ", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 14.45, "tokens": 1002.0, "prompt_tokens": 517.0, "completion_tokens": 485.0, "memory_delta_gb": 0.48, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T00:26:39.611718", "model_name": "ollama/qwen3.5:35b-a3b", "model_id": "qwen3.5:35b-a3b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 168.74, "tokens": 4973.0, "prompt_tokens": 551.0, "completion_tokens": 4422.0, "memory_delta_gb": 13.43, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T00:31:16.227048", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 11.17, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 6.19, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T00:32:46.134256", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 85.68, "tokens": 3798.0, "prompt_tokens": 533.0, "completion_tokens": 3265.0, "memory_delta_gb": 8.69, "f1": 0.9639, "precision": 1.0, "recall": 0.9302, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T00:33:24.517010", "model_name": "mlx/Narutoouz/GLM-4-9B-0414-4bit-DWQ", "model_id": "Narutoouz/GLM-4-9B-0414-4bit-DWQ", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 13.87, "tokens": 1002.0, "prompt_tokens": 517.0, "completion_tokens": 485.0, "memory_delta_gb": 5.09, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T00:36:58.504840", "model_name": "ollama/qwen3.5:35b-a3b", "model_id": "qwen3.5:35b-a3b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 128.56, "tokens": 3848.0, "prompt_tokens": 551.0, "completion_tokens": 3297.0, "memory_delta_gb": 16.8, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T09:58:51.289050", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.95, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.31, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T10:00:18.238449", "model_name": "ollama/qwen3:8b", "model_id": "qwen3:8b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 82.7, "tokens": 3798.0, "prompt_tokens": 533.0, "completion_tokens": 3265.0, "memory_delta_gb": 9.26, "f1": 0.9762, "precision": 1.0, "recall": 0.9535, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T10:02:04.809432", "model_name": "mlx/lmstudio-community/GLM-4.7-Flash-MLX-6bit", "model_id": "lmstudio-community/GLM-4.7-Flash-MLX-6bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 49.16, "tokens": 2662.0, "prompt_tokens": 517.0, "completion_tokens": 2145.0, "memory_delta_gb": 17.07, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T10:05:44.638236", "model_name": "ollama/qwen3.5:35b-a3b", "model_id": "qwen3.5:35b-a3b", "backend": "ollama", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 156.39, "tokens": 4668.0, "prompt_tokens": 551.0, "completion_tokens": 4117.0, "memory_delta_gb": 26.87, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T10:11:15.107094", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.9, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.61, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T10:15:49.617795", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 10.81, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 4.65, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}, {"timestamp": "2026-02-27T10:18:37.923347", "model_name": "mlx/mlx-community/Qwen3-8B-4bit", "model_id": "mlx-community/Qwen3-8B-4bit", "backend": "mlx", "prompt_hash": "a7738a49", "prompt_preview": "/no_think Extract information from the following meeting tra", "temperature": 0.3, "max_tokens": 8192.0, "time_sec": 11.03, "tokens": 1026.0, "prompt_tokens": 531.0, "completion_tokens": 495.0, "memory_delta_gb": 5.41, "f1": 0.9882, "precision": 1.0, "recall": 0.9767, "json_valid": true, "success": true, "error": ""}];
 
         // Get unique models and prompts
         const models = [...new Set(data.map(d => d.model_name))];
@@ -348,7 +453,7 @@
             modelSelect.appendChild(opt);
         });
 
-        // Populate prompt selector (show hash only)
+        // Populate prompt selector
         const promptSelect = document.getElementById('prompt-select');
         prompts.forEach((hash) => {
             const opt = document.createElement('option');
@@ -357,10 +462,29 @@
             promptSelect.appendChild(opt);
         });
 
-        // Color palette
-        const colors = ['#6366f1', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#f43f5e'];
+        // Color palette — warm-first
+        const colors = ['#f97316', '#06b6d4', '#8b5cf6', '#34c759', '#f43f5e', '#fb923c', '#ec4899', '#14b8a6', '#eab308', '#6366f1'];
         const modelColors = {};
         models.forEach((m, i) => modelColors[m] = colors[i % colors.length]);
+
+        // Pre-compute composite scores per model for table
+        const _modelRuns = {};
+        data.forEach(r => {
+            if (!r.success || !r.model_name) return;
+            if (!_modelRuns[r.model_name]) _modelRuns[r.model_name] = { f1s: [], times: [] };
+            _modelRuns[r.model_name].f1s.push(r.f1 || 0);
+            _modelRuns[r.model_name].times.push(r.time_sec || 0);
+        });
+        const _minTime = Math.min(...Object.values(_modelRuns).map(v => v.times.reduce((a, b) => a + b, 0) / v.times.length));
+        const _K = 10;
+        const compositeByModel = {};
+        Object.entries(_modelRuns).forEach(([model, v]) => {
+            const avgF1 = v.f1s.reduce((a, b) => a + b, 0) / v.f1s.length * 100;
+            const avgTime = v.times.reduce((a, b) => a + b, 0) / v.times.length;
+            const speedFactor = Math.pow(_minTime / avgTime, 0.3);
+            const confidence = Math.min(1, v.f1s.length / _K);
+            compositeByModel[model] = +(avgF1 * speedFactor * confidence).toFixed(1);
+        });
 
         // Populate table
         const tbody = document.getElementById('table-body');
@@ -377,15 +501,16 @@
             tr.innerHTML = `
                 <td class="text-muted">${ts}</td>
                 <td class="font-medium">${row.model_name || '-'}</td>
-                <td><span class="px-2 py-0.5 text-xs font-medium rounded-full ${row.backend === 'mlx' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-violet-500/20 text-violet-400'}">${row.backend || '-'}</span></td>
+                <td><span class="px-2 py-0.5 text-xs font-medium rounded-full ${row.backend === 'mlx' ? 'bg-orange-500/15 text-orange-500' : 'bg-violet-500/15 text-violet-400'}">${row.backend || '-'}</span></td>
                 <td>${row.time_sec ? row.time_sec.toFixed(1) : '-'}</td>
                 <td>${row.memory_delta_gb ? row.memory_delta_gb.toFixed(2) : '-'}</td>
                 <td>${row.tokens || '-'}</td>
                 <td class="font-medium">${f1}</td>
+                <td class="font-medium">${compositeByModel[row.model_name] ?? '-'}</td>
                 <td>${prec}</td>
                 <td>${rec}</td>
                 <td><code class="text-xs bg-bg px-1.5 py-0.5 rounded border border-border">${promptShort}</code></td>
-                <td class="${statusClass} font-bold">${statusIcon}</td>
+                <td class="${statusClass} font-bold text-base">${statusIcon}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -396,184 +521,345 @@
             sortable: true,
             perPage: 25,
             columns: [
-                { select: 0, sort: "desc" }  // Sort by timestamp descending
+                { select: 0, sort: "desc" }
             ]
         });
 
-        // Get theme-aware colors
+        // ── Shared helpers ──
+
         function getPlotlyColors() {
             const isDark = document.documentElement.classList.contains('dark');
             return {
                 bg: 'transparent',
-                text: isDark ? '#e5e5e5' : '#171717',
-                muted: '#737373',
-                grid: isDark ? '#262626' : '#f4f4f5',
-                line: isDark ? '#262626' : '#e4e4e7'
+                text: isDark ? '#f5f5f7' : '#1d1d1f',
+                muted: '#86868b',
+                grid: isDark ? '#2c2c2e' : '#f0f0f2',
+                line: isDark ? '#38383a' : '#d2d2d7'
             };
         }
 
-        // Plotly layout defaults
-        function getPlotlyLayout() {
+        function baseLayout() {
             const c = getPlotlyColors();
             return {
-                font: { family: 'Inter, system-ui, sans-serif', color: c.text },
+                font: { family: 'Inter, system-ui, sans-serif', size: 12, color: c.text },
                 paper_bgcolor: c.bg,
                 plot_bgcolor: c.bg,
-                margin: { t: 40, b: 60, l: 60, r: 20 }
+                hoverlabel: { font: { family: 'Inter, system-ui, sans-serif', size: 12 } },
+                transition: { duration: 350, easing: 'cubic-in-out' }
             };
         }
 
-        // Chart update function
-        function updateCharts() {
+        const plotlyConfig = { responsive: true, displayModeBar: false };
+
+        // Compute model averages (shared across charts)
+        function getModelAverages() {
+            const stats = {};
+            models.forEach(model => {
+                const d = data.filter(r => r.model_name === model && r.success);
+                if (!d.length) return;
+                stats[model] = {
+                    avgF1: d.reduce((s, r) => s + (r.f1 || 0), 0) / d.length,
+                    avgTime: d.reduce((s, r) => s + (r.time_sec || 0), 0) / d.length,
+                    avgMemory: d.reduce((s, r) => s + (r.memory_delta_gb || 0), 0) / d.length,
+                    runs: d.length
+                };
+            });
+            return stats;
+        }
+
+        // Shorten long model names for axis labels
+        function shortName(name) {
+            if (!name) return '-';
+            // Remove common prefixes
+            let s = name.replace(/^(mlx\/mlx-community\/|ollama\/|mlx\/)/, '');
+            // Truncate if still long
+            return s.length > 28 ? s.substring(0, 26) + '…' : s;
+        }
+
+        // ── Chart 1: Composite Score Ranking (horizontal bar) ──
+        // Composite = F1 × speed_factor^0.3 × confidence_factor
+        //   speed_factor = min_time / model_time (fastest = 1.0)
+        //   confidence_factor = min(1, runs / K) where K = 5
+
+        function getCompositeScores() {
+            const stats = getModelAverages();
+            const entries = Object.entries(stats).filter(([, v]) => v.avgF1 > 0);
+            const minTime = Math.min(...entries.map(([, v]) => v.avgTime));
+            const K = 10;
+
+            const scores = {};
+            entries.forEach(([model, v]) => {
+                const f1 = v.avgF1 * 100;
+                const speedFactor = Math.pow(minTime / v.avgTime, 0.3);
+                const confidence = Math.min(1, v.runs / K);
+                scores[model] = {
+                    composite: +(f1 * speedFactor * confidence).toFixed(1),
+                    f1: +f1.toFixed(1),
+                    speedFactor: +speedFactor.toFixed(2),
+                    confidence: +confidence.toFixed(2),
+                    runs: v.runs,
+                    avgTime: +v.avgTime.toFixed(1)
+                };
+            });
+            return scores;
+        }
+
+        function renderF1BarChart() {
+            const c = getPlotlyColors();
+            const scores = getCompositeScores();
+            const sorted = Object.entries(scores)
+                .sort((a, b) => a[1].composite - b[1].composite); // ascending for horizontal bar (bottom = best)
+
+            const names = sorted.map(([m]) => shortName(m));
+            const values = sorted.map(([, v]) => v.composite);
+            const fullNames = sorted.map(([m]) => m);
+            const barColors = sorted.map(([m]) => modelColors[m]);
+
+            const trace = {
+                y: names,
+                x: values,
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                    color: barColors,
+                    line: { width: 0 },
+                    cornerradius: 4
+                },
+                text: values.map(v => v.toFixed(1)),
+                textposition: 'outside',
+                textfont: { size: 11, color: c.text },
+                hovertemplate: fullNames.map((m, i) => {
+                    const s = scores[m];
+                    return `<b>${m}</b><br>Composite: ${s.composite}<br>F1: ${s.f1}% &times; Speed: ${s.speedFactor} &times; Conf: ${s.confidence}<br>Avg time: ${s.avgTime}s &middot; Runs: ${s.runs}<extra></extra>`;
+                }),
+                cliponaxis: false
+            };
+
+            const layout = {
+                ...baseLayout(),
+                margin: { t: 8, b: 20, l: 180, r: 60 },
+                xaxis: {
+                    range: [0, Math.max(...values) * 1.15],
+                    showgrid: true,
+                    gridcolor: c.grid,
+                    zeroline: false,
+                    tickfont: { size: 11, color: c.muted }
+                },
+                yaxis: {
+                    tickfont: { size: 11, color: c.text },
+                    automargin: true
+                },
+                bargap: 0.25
+            };
+
+            Plotly.newPlot('f1-bar-chart', [trace], layout, plotlyConfig);
+        }
+
+        // ── Chart 2: Speed vs Quality Bubble ──
+
+        function renderBubbleChart() {
+            const c = getPlotlyColors();
+            const stats = getModelAverages();
+            const active = models.filter(m => stats[m]);
+
+            // Scale bubble sizes relative to max memory
+            const memValues = active.map(m => stats[m].avgMemory || 0.5);
+            const maxMem = Math.max(...memValues, 1);
+
+            const trace = {
+                x: active.map(m => stats[m].avgTime),
+                y: active.map(m => stats[m].avgF1 * 100),
+                text: active.map(m => shortName(m)),
+                mode: 'markers+text',
+                textposition: 'top center',
+                textfont: { size: 9, color: c.muted },
+                marker: {
+                    size: active.map(m => {
+                        const norm = (stats[m].avgMemory || 0.5) / maxMem;
+                        return 18 + norm * 40;
+                    }),
+                    color: active.map(m => modelColors[m]),
+                    opacity: 0.85,
+                    line: { width: 2, color: c.grid }
+                },
+                hovertemplate: active.map(m => {
+                    const s = stats[m];
+                    return `<b>${m}</b><br>Time: ${s.avgTime.toFixed(1)}s<br>F1: ${(s.avgF1 * 100).toFixed(1)}%<br>Memory: ${s.avgMemory.toFixed(2)} GB<br>Runs: ${s.runs}<extra></extra>`;
+                }),
+                showlegend: false
+            };
+
+            const times = active.map(m => stats[m].avgTime);
+            const maxTime = Math.max(...times, 1) * 1.2;
+
+            const layout = {
+                ...baseLayout(),
+                margin: { t: 16, b: 44, l: 50, r: 16 },
+                xaxis: {
+                    title: { text: 'Avg Time (s)', font: { size: 11, color: c.muted }, standoff: 8 },
+                    range: [0, maxTime],
+                    zeroline: false,
+                    showgrid: true,
+                    gridcolor: c.grid,
+                    tickfont: { size: 11, color: c.muted }
+                },
+                yaxis: {
+                    title: { text: 'Avg F1 (%)', font: { size: 11, color: c.muted }, standoff: 8 },
+                    range: [Math.max(0, Math.min(...active.map(m => stats[m].avgF1 * 100)) - 10), 108],
+                    showgrid: true,
+                    gridcolor: c.grid,
+                    tickfont: { size: 11, color: c.muted }
+                },
+                hovermode: 'closest'
+            };
+
+            Plotly.newPlot('bubble-chart', [trace], layout, plotlyConfig);
+        }
+
+        // ── Chart 3: Metrics Over Time ──
+
+        function updateTimeChart() {
             const metric = document.getElementById('metric-select').value;
             const selectedModel = document.getElementById('model-select').value;
             const selectedPrompt = document.getElementById('prompt-select').value;
             const c = getPlotlyColors();
 
             const metricLabels = {
-                'f1': 'F1 Score',
-                'time_sec': 'Time (seconds)',
-                'memory_delta_gb': 'Memory Delta (GB)',
-                'tokens': 'Total Tokens',
-                'completion_tokens': 'Completion Tokens'
+                'f1': 'F1 Score (%)',
+                'time_sec': 'Time (s)',
+                'memory_delta_gb': 'Memory (GB)',
+                'tokens': 'Total Tokens'
             };
 
-            let filteredData = data;
+            let filtered = data;
             if (selectedPrompt !== 'all') {
-                filteredData = data.filter(d => d.prompt_hash === selectedPrompt);
+                filtered = data.filter(d => d.prompt_hash === selectedPrompt);
             }
 
-            let traces = [];
+            const traces = [];
+            const targetModels = selectedModel === 'all' ? models : [selectedModel];
 
-            if (selectedModel === 'all') {
-                models.forEach(model => {
-                    const modelData = filteredData.filter(d => d.model_name === model && d.success);
-                    if (modelData.length === 0) return;
+            targetModels.forEach(model => {
+                const md = filtered.filter(d => d.model_name === model && d.success);
+                if (!md.length) return;
 
-                    traces.push({
-                        x: modelData.map(d => d.timestamp),
-                        y: modelData.map(d => metric === 'f1' ? (d[metric] || 0) * 100 : d[metric]),
-                        type: 'scatter',
-                        mode: 'lines+markers',
-                        name: model,
-                        line: { color: modelColors[model], width: 2 },
-                        marker: { size: 8 }
-                    });
-                });
-            } else {
-                const modelData = filteredData.filter(d => d.model_name === selectedModel && d.success);
                 traces.push({
-                    x: modelData.map(d => d.timestamp),
-                    y: modelData.map(d => metric === 'f1' ? (d[metric] || 0) * 100 : d[metric]),
+                    x: md.map(d => d.timestamp),
+                    y: md.map(d => metric === 'f1' ? (d[metric] || 0) * 100 : d[metric]),
                     type: 'scatter',
                     mode: 'lines+markers',
-                    name: selectedModel,
-                    line: { color: modelColors[selectedModel], width: 2 },
-                    marker: { size: 8 }
+                    name: shortName(model),
+                    line: { color: modelColors[model], width: 2.5, shape: 'spline' },
+                    marker: { size: 6, color: modelColors[model] },
+                    hovertemplate: `<b>${model}</b><br>%{x|%b %d}<br>${metricLabels[metric]}: %{y:.1f}<extra></extra>`
                 });
-            }
+            });
 
             const layout = {
-                ...getPlotlyLayout(),
+                ...baseLayout(),
+                margin: { t: 8, b: 64, l: 48, r: 12 },
                 xaxis: {
-                    title: { text: 'Time', font: { size: 12, color: c.muted } },
-                    tickangle: -45,
-                    gridcolor: c.grid,
+                    tickangle: -40,
+                    showgrid: false,
                     linecolor: c.line,
-                    tickfont: { color: c.muted }
+                    tickfont: { size: 10, color: c.muted },
+                    type: 'date'
                 },
                 yaxis: {
-                    title: { text: metricLabels[metric] + (metric === 'f1' ? ' (%)' : ''), font: { size: 12, color: c.muted } },
+                    title: { text: metricLabels[metric], font: { size: 11, color: c.muted }, standoff: 4 },
                     rangemode: 'tozero',
+                    showgrid: true,
                     gridcolor: c.grid,
-                    linecolor: c.line,
-                    tickfont: { color: c.muted }
+                    zeroline: false,
+                    tickfont: { size: 11, color: c.muted }
                 },
                 legend: {
                     orientation: 'h',
-                    y: -0.35,
-                    font: { size: 11, color: c.text }
+                    y: -0.38,
+                    x: 0.5,
+                    xanchor: 'center',
+                    font: { size: 10, color: c.muted },
+                    bgcolor: 'transparent'
                 },
-                margin: { t: 40, b: 80, l: 60, r: 20 },
-                hovermode: 'closest'
+                hovermode: 'x unified'
             };
 
-            Plotly.newPlot('main-chart', traces, layout, {responsive: true, displayModeBar: false});
+            Plotly.newPlot('time-chart', traces, layout, plotlyConfig);
         }
 
-        // Bubble chart
-        function renderBubbleChart() {
+        // ── Chart 4: Resource Usage (grouped bar) ──
+
+        function renderResourceChart() {
             const c = getPlotlyColors();
-            const modelStats = {};
-            models.forEach(model => {
-                const modelData = data.filter(d => d.model_name === model && d.success);
-                if (modelData.length === 0) return;
+            const stats = getModelAverages();
+            const sorted = Object.entries(stats)
+                .sort((a, b) => a[1].avgTime - b[1].avgTime); // fastest first
 
-                const avgTime = modelData.reduce((sum, d) => sum + (d.time_sec || 0), 0) / modelData.length;
-                const avgF1 = modelData.reduce((sum, d) => sum + (d.f1 || 0), 0) / modelData.length;
-                const avgMemory = modelData.reduce((sum, d) => sum + (d.memory_delta_gb || 0), 0) / modelData.length;
-                const runs = modelData.length;
+            const names = sorted.map(([m]) => shortName(m));
+            const fullNames = sorted.map(([m]) => m);
 
-                modelStats[model] = { avgTime, avgF1, avgMemory, runs };
-            });
-
-            const activeModels = models.filter(m => modelStats[m]);
-
-            const bubbleTrace = {
-                x: activeModels.map(m => modelStats[m].avgTime),
-                y: activeModels.map(m => modelStats[m].avgF1 * 100),
-                mode: 'markers',
-                marker: {
-                    size: activeModels.map(m => {
-                        const mem = modelStats[m].avgMemory || 1;
-                        return Math.max(20, Math.min(50, mem * 2));
-                    }),
-                    color: activeModels.map((m, i) => colors[i % colors.length]),
-                    opacity: 0.8,
-                    line: { width: 1, color: 'white' }
-                },
-                hovertemplate: activeModels.map(m => {
-                    const s = modelStats[m];
-                    return `<b>${m}</b><br>` +
-                           `Time: ${s.avgTime.toFixed(1)}s<br>` +
-                           `F1: ${(s.avgF1 * 100).toFixed(1)}%<br>` +
-                           `Memory: ${s.avgMemory.toFixed(1)} GB<br>` +
-                           `Runs: ${s.runs}<extra></extra>`;
-                }),
-                showlegend: false
+            const timeTrace = {
+                x: names,
+                y: sorted.map(([, v]) => +v.avgTime.toFixed(1)),
+                name: 'Time (s)',
+                type: 'bar',
+                marker: { color: '#06b6d4', cornerradius: 3 },
+                hovertemplate: fullNames.map((m, i) =>
+                    `<b>${m}</b><br>Avg Time: ${sorted[i][1].avgTime.toFixed(1)}s<extra></extra>`
+                )
             };
 
-            const times = activeModels.map(m => modelStats[m].avgTime);
-            const maxTime = Math.max(...times) * 1.15;
+            const memTrace = {
+                x: names,
+                y: sorted.map(([, v]) => +v.avgMemory.toFixed(2)),
+                name: 'Memory (GB)',
+                type: 'bar',
+                marker: { color: '#8b5cf6', cornerradius: 3 },
+                hovertemplate: fullNames.map((m, i) =>
+                    `<b>${m}</b><br>Avg Memory: ${sorted[i][1].avgMemory.toFixed(2)} GB<extra></extra>`
+                )
+            };
 
-            const bubbleLayout = {
-                ...getPlotlyLayout(),
-                margin: { t: 10, b: 50, l: 50, r: 20 },
+            const layout = {
+                ...baseLayout(),
+                barmode: 'group',
+                bargap: 0.25,
+                bargroupgap: 0.08,
+                margin: { t: 8, b: 100, l: 48, r: 12 },
                 xaxis: {
-                    title: { text: 'Average Time (seconds)', font: { size: 11, color: c.muted } },
-                    range: [0, maxTime],
-                    zeroline: false,
-                    gridcolor: c.grid,
-                    linecolor: c.line,
-                    tickfont: { color: c.muted }
+                    tickangle: -40,
+                    tickfont: { size: 10, color: c.muted },
+                    automargin: true
                 },
                 yaxis: {
-                    title: { text: 'Average F1 Score (%)', font: { size: 11, color: c.muted } },
-                    range: [0, 120],
-                    tickvals: [0, 20, 40, 60, 80, 100],
+                    showgrid: true,
                     gridcolor: c.grid,
-                    linecolor: c.line,
-                    tickfont: { color: c.muted }
+                    zeroline: false,
+                    tickfont: { size: 11, color: c.muted }
                 },
-                hovermode: 'closest'
+                legend: {
+                    orientation: 'h',
+                    y: 1.06,
+                    x: 0.5,
+                    xanchor: 'center',
+                    font: { size: 11, color: c.text },
+                    bgcolor: 'transparent'
+                }
             };
 
-            Plotly.newPlot('bubble-chart', [bubbleTrace], bubbleLayout, {responsive: true, displayModeBar: false});
+            Plotly.newPlot('resource-chart', [timeTrace, memTrace], layout, plotlyConfig);
         }
 
-        // Initial chart render
-        updateCharts();
-        renderBubbleChart();
+        // ── Render all ──
+
+        function renderAllCharts() {
+            renderF1BarChart();
+            renderBubbleChart();
+            updateTimeChart();
+            renderResourceChart();
+        }
+
+        renderAllCharts();
     </script>
 </body>
 </html>
