@@ -41,52 +41,118 @@
 
     <style>
         :root {
-            --bg: #f5f5f5;
+            --bg: #f5f5f7;
             --surface: #ffffff;
-            --border: #e5e5e5;
-            --text: #171717;
-            --muted: #737373;
+            --border: #d2d2d7;
+            --text: #1d1d1f;
+            --muted: #86868b;
+            --accent: #f97316;
+            --accent-light: #fff7ed;
+            --success: #34c759;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.08);
+            --radius: 16px;
+            --radius-sm: 10px;
         }
         .dark {
-            --bg: #0a0a0a;
-            --surface: #171717;
-            --border: #262626;
-            --text: #e5e5e5;
-            --muted: #737373;
+            --bg: #000000;
+            --surface: #1c1c1e;
+            --border: #38383a;
+            --text: #f5f5f7;
+            --muted: #86868b;
+            --accent-light: #1a1207;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate { animation: fadeIn 0.4s ease forwards; }
+        .delay-1 { animation-delay: 0.05s; opacity: 0; }
+        .delay-2 { animation-delay: 0.1s; opacity: 0; }
+        .delay-3 { animation-delay: 0.15s; opacity: 0; }
+        .delay-4 { animation-delay: 0.2s; opacity: 0; }
+        .delay-5 { animation-delay: 0.25s; opacity: 0; }
+        .delay-6 { animation-delay: 0.3s; opacity: 0; }
+        .delay-7 { animation-delay: 0.35s; opacity: 0; }
+        .delay-8 { animation-delay: 0.4s; opacity: 0; }
+
+        /* Card system */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Stat values */
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.1;
+        }
+        .stat-label {
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .stat-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 2px;
         }
 
         /* DataTable overrides */
         .datatable-wrapper .datatable-search input {
             padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
+            border-radius: var(--radius-sm);
             border: 1px solid var(--border);
             background: var(--surface);
             color: var(--text);
             font-size: 0.875rem;
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
         .datatable-wrapper .datatable-search input:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
         }
         .datatable-wrapper .datatable-top,
         .datatable-wrapper .datatable-bottom {
             padding: 0.75rem 0;
         }
         .datatable-wrapper .datatable-selector {
-            padding: 0.375rem 0.5rem;
+            padding: 0.5rem 0.625rem;
             border-radius: 0.375rem;
             border: 1px solid var(--border);
             background: var(--surface);
             color: var(--text);
         }
+        .datatable-wrapper .datatable-selector:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
+            outline: none;
+        }
         .datatable-wrapper .datatable-pagination .datatable-pagination-list-item-link {
             padding: 0.375rem 0.75rem;
             border-radius: 0.375rem;
             color: var(--text);
+            transition: background-color 0.15s;
         }
         .datatable-wrapper .datatable-pagination .datatable-pagination-list-item.datatable-active .datatable-pagination-list-item-link {
-            background-color: #6366f1;
+            background-color: #f97316;
             color: white;
         }
         .datatable-wrapper .datatable-info {
@@ -94,8 +160,11 @@
         }
 
         /* Table styling */
+        table.dataTable tbody tr {
+            transition: background-color 0.15s;
+        }
         table.dataTable tbody tr:hover {
-            background-color: var(--bg);
+            background-color: var(--accent-light);
         }
         table.dataTable th {
             background-color: var(--bg);
@@ -111,6 +180,23 @@
         }
         table.dataTable td {
             color: var(--text);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Select styling */
+        select.filter-select {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            background: var(--surface);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        select.filter-select:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
         }
     </style>
 </head>
@@ -145,10 +231,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
 
         <!-- Page Header -->
-        <div class="mb-8">
+        <div class="mb-8 animate delay-1">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-400 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
@@ -159,14 +245,14 @@
                     </div>
                 </div>
                 <div class="text-right">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-surface border border-border text-text">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-surface border border-border text-text shadow-sm">
                         {{ total_runs }} runs
                     </span>
                 </div>
             </div>
 
             <!-- System Info Bar -->
-            <div class="bg-surface/50 rounded-lg border border-border p-4 mb-4">
+            <div class="card animate delay-2 mb-4">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                         <p class="text-muted text-xs uppercase tracking-wide mb-1">System</p>
@@ -206,73 +292,93 @@
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Total Runs</p>
-                <p class="text-2xl font-semibold text-text mt-1">{{ total_runs }}</p>
+            <div class="card animate delay-3">
+                <p class="stat-label">Total Runs</p>
+                <p class="stat-value mt-2" style="color: #f97316;">{{ total_runs }}</p>
             </div>
-            <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Best Avg F1</p>
-                <p class="text-2xl font-semibold text-emerald-500 mt-1">{{ best_f1 }}%</p>
-                <p class="text-xs text-muted mt-0.5">{{ best_f1_model }}</p>
+            <div class="card animate delay-4">
+                <p class="stat-label">Best Avg F1</p>
+                <p class="stat-value mt-2" style="color: #34c759;">{{ best_f1 }}%</p>
+                <p class="stat-sub">{{ best_f1_model }}</p>
             </div>
-            <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Fastest Avg</p>
-                <p class="text-2xl font-semibold text-indigo-500 mt-1">{{ fastest_time }}s</p>
-                <p class="text-xs text-muted mt-0.5">{{ fastest_model }}</p>
+            <div class="card animate delay-5">
+                <p class="stat-label">Fastest Avg</p>
+                <p class="stat-value mt-2" style="color: #06b6d4;">{{ fastest_time }}s</p>
+                <p class="stat-sub">{{ fastest_model }}</p>
             </div>
-            <div class="bg-surface rounded-xl border border-border p-4">
-                <p class="text-xs font-medium text-muted uppercase tracking-wide">Lowest Avg Memory</p>
-                <p class="text-2xl font-semibold text-violet-500 mt-1">{{ lowest_memory }} GB</p>
-                <p class="text-xs text-muted mt-0.5">{{ lowest_memory_model }}</p>
+            <div class="card animate delay-6">
+                <p class="stat-label">Lowest Avg Memory</p>
+                <p class="stat-value mt-2" style="color: #8b5cf6;">{{ lowest_memory }} GB</p>
+                <p class="stat-sub">{{ lowest_memory_model }}</p>
             </div>
         </div>
 
-        <!-- Charts Grid -->
+        <!-- Charts Row 1 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- F1 Score Ranking -->
+            <div class="card animate delay-7" style="padding: 24px;">
+                <div class="mb-2">
+                    <h2 class="text-lg font-semibold text-text">F1 Score by Model</h2>
+                    <p class="text-xs text-muted mt-1">Average across all runs &middot; higher is better</p>
+                </div>
+                <div id="f1-bar-chart" style="height: 320px;"></div>
+            </div>
+
+            <!-- Speed vs Quality Bubble -->
+            <div class="card animate delay-8" style="padding: 24px;">
+                <div class="mb-2">
+                    <h2 class="text-lg font-semibold text-text">Speed vs Quality</h2>
+                    <p class="text-xs text-muted mt-1">Bubble size = memory &middot; top-left is ideal</p>
+                </div>
+                <div id="bubble-chart" style="height: 320px;"></div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Time Series Chart -->
-            <div class="bg-surface rounded-xl border border-border p-5">
-                <div class="flex items-center justify-between mb-4">
+            <!-- Metrics Over Time -->
+            <div class="card animate delay-7" style="padding: 24px;">
+                <div class="flex items-center justify-between mb-3">
                     <h2 class="text-lg font-semibold text-text">Metrics Over Time</h2>
                 </div>
-                <div class="flex items-center gap-4 mb-4">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
                     <div class="flex items-center gap-1.5">
                         <label for="metric-select" class="text-xs font-medium text-muted">Metric:</label>
-                        <select id="metric-select" onchange="updateCharts()" class="w-28 px-2 py-1 text-xs border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <select id="metric-select" onchange="updateTimeChart()" class="filter-select w-28">
                             <option value="f1">F1 Score</option>
                             <option value="time_sec">Time (s)</option>
                             <option value="memory_delta_gb">Memory (GB)</option>
                             <option value="tokens">Tokens</option>
-                            <option value="completion_tokens">Completion</option>
                         </select>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <label for="model-select" class="text-xs font-medium text-muted">Model:</label>
-                        <select id="model-select" onchange="updateCharts()" class="w-28 px-2 py-1 text-xs border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <select id="model-select" onchange="updateTimeChart()" class="filter-select w-28">
                             <option value="all">All</option>
                         </select>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <label for="prompt-select" class="text-xs font-medium text-muted">Prompt:</label>
-                        <select id="prompt-select" onchange="updateCharts()" class="w-24 px-2 py-1 text-xs border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono">
+                        <select id="prompt-select" onchange="updateTimeChart()" class="filter-select w-24 font-mono">
                             <option value="all">All</option>
                         </select>
                     </div>
                 </div>
-                <div id="main-chart" class="h-80"></div>
+                <div id="time-chart" style="height: 280px;"></div>
             </div>
 
-            <!-- Bubble Chart -->
-            <div class="bg-surface rounded-xl border border-border p-5">
-                <div class="mb-4">
-                    <h2 class="text-lg font-semibold text-text">Model Comparison</h2>
-                    <p class="text-sm text-muted mt-1">Bubble size = memory usage</p>
+            <!-- Resource Usage -->
+            <div class="card animate delay-8" style="padding: 24px;">
+                <div class="mb-2">
+                    <h2 class="text-lg font-semibold text-text">Resource Usage</h2>
+                    <p class="text-xs text-muted mt-1">Average time &amp; memory per model</p>
                 </div>
-                <div id="bubble-chart" class="h-80"></div>
+                <div id="resource-chart" style="height: 320px;"></div>
             </div>
         </div>
 
         <!-- Results Table -->
-        <div class="bg-surface rounded-xl border border-border p-5">
+        <div class="card animate delay-8" style="padding: 24px;">
             <h2 class="text-lg font-semibold text-text mb-4">All Results</h2>
             <div class="overflow-x-auto">
                 <table id="results-table" class="w-full">
@@ -328,9 +434,7 @@
         themeToggle.addEventListener('click', () => {
             html.classList.toggle('dark');
             localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-            // Re-render charts with new theme
-            updateCharts();
-            renderBubbleChart();
+            renderAllCharts();
         });
 
         const data = {{ data_json | safe }};
@@ -348,7 +452,7 @@
             modelSelect.appendChild(opt);
         });
 
-        // Populate prompt selector (show hash only)
+        // Populate prompt selector
         const promptSelect = document.getElementById('prompt-select');
         prompts.forEach((hash) => {
             const opt = document.createElement('option');
@@ -357,8 +461,8 @@
             promptSelect.appendChild(opt);
         });
 
-        // Color palette
-        const colors = ['#6366f1', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#f43f5e'];
+        // Color palette — warm-first
+        const colors = ['#f97316', '#06b6d4', '#8b5cf6', '#34c759', '#f43f5e', '#fb923c', '#ec4899', '#14b8a6', '#eab308', '#6366f1'];
         const modelColors = {};
         models.forEach((m, i) => modelColors[m] = colors[i % colors.length]);
 
@@ -377,7 +481,7 @@
             tr.innerHTML = `
                 <td class="text-muted">${ts}</td>
                 <td class="font-medium">${row.model_name || '-'}</td>
-                <td><span class="px-2 py-0.5 text-xs font-medium rounded-full ${row.backend === 'mlx' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-violet-500/20 text-violet-400'}">${row.backend || '-'}</span></td>
+                <td><span class="px-2 py-0.5 text-xs font-medium rounded-full ${row.backend === 'mlx' ? 'bg-orange-500/15 text-orange-500' : 'bg-violet-500/15 text-violet-400'}">${row.backend || '-'}</span></td>
                 <td>${row.time_sec ? row.time_sec.toFixed(1) : '-'}</td>
                 <td>${row.memory_delta_gb ? row.memory_delta_gb.toFixed(2) : '-'}</td>
                 <td>${row.tokens || '-'}</td>
@@ -385,7 +489,7 @@
                 <td>${prec}</td>
                 <td>${rec}</td>
                 <td><code class="text-xs bg-bg px-1.5 py-0.5 rounded border border-border">${promptShort}</code></td>
-                <td class="${statusClass} font-bold">${statusIcon}</td>
+                <td class="${statusClass} font-bold text-base">${statusIcon}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -396,184 +500,320 @@
             sortable: true,
             perPage: 25,
             columns: [
-                { select: 0, sort: "desc" }  // Sort by timestamp descending
+                { select: 0, sort: "desc" }
             ]
         });
 
-        // Get theme-aware colors
+        // ── Shared helpers ──
+
         function getPlotlyColors() {
             const isDark = document.documentElement.classList.contains('dark');
             return {
                 bg: 'transparent',
-                text: isDark ? '#e5e5e5' : '#171717',
-                muted: '#737373',
-                grid: isDark ? '#262626' : '#f4f4f5',
-                line: isDark ? '#262626' : '#e4e4e7'
+                text: isDark ? '#f5f5f7' : '#1d1d1f',
+                muted: '#86868b',
+                grid: isDark ? '#2c2c2e' : '#f0f0f2',
+                line: isDark ? '#38383a' : '#d2d2d7'
             };
         }
 
-        // Plotly layout defaults
-        function getPlotlyLayout() {
+        function baseLayout() {
             const c = getPlotlyColors();
             return {
-                font: { family: 'Inter, system-ui, sans-serif', color: c.text },
+                font: { family: 'Inter, system-ui, sans-serif', size: 12, color: c.text },
                 paper_bgcolor: c.bg,
                 plot_bgcolor: c.bg,
-                margin: { t: 40, b: 60, l: 60, r: 20 }
+                hoverlabel: { font: { family: 'Inter, system-ui, sans-serif', size: 12 } },
+                transition: { duration: 350, easing: 'cubic-in-out' }
             };
         }
 
-        // Chart update function
-        function updateCharts() {
+        const plotlyConfig = { responsive: true, displayModeBar: false };
+
+        // Compute model averages (shared across charts)
+        function getModelAverages() {
+            const stats = {};
+            models.forEach(model => {
+                const d = data.filter(r => r.model_name === model && r.success);
+                if (!d.length) return;
+                stats[model] = {
+                    avgF1: d.reduce((s, r) => s + (r.f1 || 0), 0) / d.length,
+                    avgTime: d.reduce((s, r) => s + (r.time_sec || 0), 0) / d.length,
+                    avgMemory: d.reduce((s, r) => s + (r.memory_delta_gb || 0), 0) / d.length,
+                    runs: d.length
+                };
+            });
+            return stats;
+        }
+
+        // Shorten long model names for axis labels
+        function shortName(name) {
+            if (!name) return '-';
+            // Remove common prefixes
+            let s = name.replace(/^(mlx\/mlx-community\/|ollama\/|mlx\/)/, '');
+            // Truncate if still long
+            return s.length > 28 ? s.substring(0, 26) + '…' : s;
+        }
+
+        // ── Chart 1: F1 Score Ranking (horizontal bar) ──
+
+        function renderF1BarChart() {
+            const c = getPlotlyColors();
+            const stats = getModelAverages();
+            const sorted = Object.entries(stats)
+                .filter(([, v]) => v.avgF1 > 0)
+                .sort((a, b) => a[1].avgF1 - b[1].avgF1); // ascending for horizontal bar (bottom = best)
+
+            const names = sorted.map(([m]) => shortName(m));
+            const values = sorted.map(([, v]) => +(v.avgF1 * 100).toFixed(1));
+            const fullNames = sorted.map(([m]) => m);
+            const barColors = sorted.map(([m]) => modelColors[m]);
+
+            const trace = {
+                y: names,
+                x: values,
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                    color: barColors,
+                    line: { width: 0 },
+                    cornerradius: 4
+                },
+                text: values.map(v => v.toFixed(1) + '%'),
+                textposition: 'outside',
+                textfont: { size: 11, color: c.text },
+                hovertemplate: fullNames.map((m, i) =>
+                    `<b>${m}</b><br>Avg F1: ${values[i]}%<br>Runs: ${stats[m].runs}<extra></extra>`
+                ),
+                cliponaxis: false
+            };
+
+            const layout = {
+                ...baseLayout(),
+                margin: { t: 8, b: 20, l: 180, r: 60 },
+                xaxis: {
+                    range: [0, Math.min(110, Math.max(...values) * 1.15)],
+                    showgrid: true,
+                    gridcolor: c.grid,
+                    zeroline: false,
+                    ticksuffix: '%',
+                    tickfont: { size: 11, color: c.muted }
+                },
+                yaxis: {
+                    tickfont: { size: 11, color: c.text },
+                    automargin: true
+                },
+                bargap: 0.25
+            };
+
+            Plotly.newPlot('f1-bar-chart', [trace], layout, plotlyConfig);
+        }
+
+        // ── Chart 2: Speed vs Quality Bubble ──
+
+        function renderBubbleChart() {
+            const c = getPlotlyColors();
+            const stats = getModelAverages();
+            const active = models.filter(m => stats[m]);
+
+            // Scale bubble sizes relative to max memory
+            const memValues = active.map(m => stats[m].avgMemory || 0.5);
+            const maxMem = Math.max(...memValues, 1);
+
+            const trace = {
+                x: active.map(m => stats[m].avgTime),
+                y: active.map(m => stats[m].avgF1 * 100),
+                text: active.map(m => shortName(m)),
+                mode: 'markers+text',
+                textposition: 'top center',
+                textfont: { size: 9, color: c.muted },
+                marker: {
+                    size: active.map(m => {
+                        const norm = (stats[m].avgMemory || 0.5) / maxMem;
+                        return 18 + norm * 40;
+                    }),
+                    color: active.map(m => modelColors[m]),
+                    opacity: 0.85,
+                    line: { width: 2, color: c.grid }
+                },
+                hovertemplate: active.map(m => {
+                    const s = stats[m];
+                    return `<b>${m}</b><br>Time: ${s.avgTime.toFixed(1)}s<br>F1: ${(s.avgF1 * 100).toFixed(1)}%<br>Memory: ${s.avgMemory.toFixed(2)} GB<br>Runs: ${s.runs}<extra></extra>`;
+                }),
+                showlegend: false
+            };
+
+            const times = active.map(m => stats[m].avgTime);
+            const maxTime = Math.max(...times, 1) * 1.2;
+
+            const layout = {
+                ...baseLayout(),
+                margin: { t: 16, b: 44, l: 50, r: 16 },
+                xaxis: {
+                    title: { text: 'Avg Time (s)', font: { size: 11, color: c.muted }, standoff: 8 },
+                    range: [0, maxTime],
+                    zeroline: false,
+                    showgrid: true,
+                    gridcolor: c.grid,
+                    tickfont: { size: 11, color: c.muted }
+                },
+                yaxis: {
+                    title: { text: 'Avg F1 (%)', font: { size: 11, color: c.muted }, standoff: 8 },
+                    range: [Math.max(0, Math.min(...active.map(m => stats[m].avgF1 * 100)) - 10), 108],
+                    showgrid: true,
+                    gridcolor: c.grid,
+                    tickfont: { size: 11, color: c.muted }
+                },
+                hovermode: 'closest'
+            };
+
+            Plotly.newPlot('bubble-chart', [trace], layout, plotlyConfig);
+        }
+
+        // ── Chart 3: Metrics Over Time ──
+
+        function updateTimeChart() {
             const metric = document.getElementById('metric-select').value;
             const selectedModel = document.getElementById('model-select').value;
             const selectedPrompt = document.getElementById('prompt-select').value;
             const c = getPlotlyColors();
 
             const metricLabels = {
-                'f1': 'F1 Score',
-                'time_sec': 'Time (seconds)',
-                'memory_delta_gb': 'Memory Delta (GB)',
-                'tokens': 'Total Tokens',
-                'completion_tokens': 'Completion Tokens'
+                'f1': 'F1 Score (%)',
+                'time_sec': 'Time (s)',
+                'memory_delta_gb': 'Memory (GB)',
+                'tokens': 'Total Tokens'
             };
 
-            let filteredData = data;
+            let filtered = data;
             if (selectedPrompt !== 'all') {
-                filteredData = data.filter(d => d.prompt_hash === selectedPrompt);
+                filtered = data.filter(d => d.prompt_hash === selectedPrompt);
             }
 
-            let traces = [];
+            const traces = [];
+            const targetModels = selectedModel === 'all' ? models : [selectedModel];
 
-            if (selectedModel === 'all') {
-                models.forEach(model => {
-                    const modelData = filteredData.filter(d => d.model_name === model && d.success);
-                    if (modelData.length === 0) return;
+            targetModels.forEach(model => {
+                const md = filtered.filter(d => d.model_name === model && d.success);
+                if (!md.length) return;
 
-                    traces.push({
-                        x: modelData.map(d => d.timestamp),
-                        y: modelData.map(d => metric === 'f1' ? (d[metric] || 0) * 100 : d[metric]),
-                        type: 'scatter',
-                        mode: 'lines+markers',
-                        name: model,
-                        line: { color: modelColors[model], width: 2 },
-                        marker: { size: 8 }
-                    });
-                });
-            } else {
-                const modelData = filteredData.filter(d => d.model_name === selectedModel && d.success);
                 traces.push({
-                    x: modelData.map(d => d.timestamp),
-                    y: modelData.map(d => metric === 'f1' ? (d[metric] || 0) * 100 : d[metric]),
+                    x: md.map(d => d.timestamp),
+                    y: md.map(d => metric === 'f1' ? (d[metric] || 0) * 100 : d[metric]),
                     type: 'scatter',
                     mode: 'lines+markers',
-                    name: selectedModel,
-                    line: { color: modelColors[selectedModel], width: 2 },
-                    marker: { size: 8 }
+                    name: shortName(model),
+                    line: { color: modelColors[model], width: 2.5, shape: 'spline' },
+                    marker: { size: 6, color: modelColors[model] },
+                    hovertemplate: `<b>${model}</b><br>%{x|%b %d}<br>${metricLabels[metric]}: %{y:.1f}<extra></extra>`
                 });
-            }
+            });
 
             const layout = {
-                ...getPlotlyLayout(),
+                ...baseLayout(),
+                margin: { t: 8, b: 64, l: 48, r: 12 },
                 xaxis: {
-                    title: { text: 'Time', font: { size: 12, color: c.muted } },
-                    tickangle: -45,
-                    gridcolor: c.grid,
+                    tickangle: -40,
+                    showgrid: false,
                     linecolor: c.line,
-                    tickfont: { color: c.muted }
+                    tickfont: { size: 10, color: c.muted },
+                    type: 'date'
                 },
                 yaxis: {
-                    title: { text: metricLabels[metric] + (metric === 'f1' ? ' (%)' : ''), font: { size: 12, color: c.muted } },
+                    title: { text: metricLabels[metric], font: { size: 11, color: c.muted }, standoff: 4 },
                     rangemode: 'tozero',
+                    showgrid: true,
                     gridcolor: c.grid,
-                    linecolor: c.line,
-                    tickfont: { color: c.muted }
+                    zeroline: false,
+                    tickfont: { size: 11, color: c.muted }
                 },
                 legend: {
                     orientation: 'h',
-                    y: -0.35,
-                    font: { size: 11, color: c.text }
+                    y: -0.38,
+                    x: 0.5,
+                    xanchor: 'center',
+                    font: { size: 10, color: c.muted },
+                    bgcolor: 'transparent'
                 },
-                margin: { t: 40, b: 80, l: 60, r: 20 },
-                hovermode: 'closest'
+                hovermode: 'x unified'
             };
 
-            Plotly.newPlot('main-chart', traces, layout, {responsive: true, displayModeBar: false});
+            Plotly.newPlot('time-chart', traces, layout, plotlyConfig);
         }
 
-        // Bubble chart
-        function renderBubbleChart() {
+        // ── Chart 4: Resource Usage (grouped bar) ──
+
+        function renderResourceChart() {
             const c = getPlotlyColors();
-            const modelStats = {};
-            models.forEach(model => {
-                const modelData = data.filter(d => d.model_name === model && d.success);
-                if (modelData.length === 0) return;
+            const stats = getModelAverages();
+            const sorted = Object.entries(stats)
+                .sort((a, b) => a[1].avgTime - b[1].avgTime); // fastest first
 
-                const avgTime = modelData.reduce((sum, d) => sum + (d.time_sec || 0), 0) / modelData.length;
-                const avgF1 = modelData.reduce((sum, d) => sum + (d.f1 || 0), 0) / modelData.length;
-                const avgMemory = modelData.reduce((sum, d) => sum + (d.memory_delta_gb || 0), 0) / modelData.length;
-                const runs = modelData.length;
+            const names = sorted.map(([m]) => shortName(m));
+            const fullNames = sorted.map(([m]) => m);
 
-                modelStats[model] = { avgTime, avgF1, avgMemory, runs };
-            });
-
-            const activeModels = models.filter(m => modelStats[m]);
-
-            const bubbleTrace = {
-                x: activeModels.map(m => modelStats[m].avgTime),
-                y: activeModels.map(m => modelStats[m].avgF1 * 100),
-                mode: 'markers',
-                marker: {
-                    size: activeModels.map(m => {
-                        const mem = modelStats[m].avgMemory || 1;
-                        return Math.max(20, Math.min(50, mem * 2));
-                    }),
-                    color: activeModels.map((m, i) => colors[i % colors.length]),
-                    opacity: 0.8,
-                    line: { width: 1, color: 'white' }
-                },
-                hovertemplate: activeModels.map(m => {
-                    const s = modelStats[m];
-                    return `<b>${m}</b><br>` +
-                           `Time: ${s.avgTime.toFixed(1)}s<br>` +
-                           `F1: ${(s.avgF1 * 100).toFixed(1)}%<br>` +
-                           `Memory: ${s.avgMemory.toFixed(1)} GB<br>` +
-                           `Runs: ${s.runs}<extra></extra>`;
-                }),
-                showlegend: false
+            const timeTrace = {
+                x: names,
+                y: sorted.map(([, v]) => +v.avgTime.toFixed(1)),
+                name: 'Time (s)',
+                type: 'bar',
+                marker: { color: '#06b6d4', cornerradius: 3 },
+                hovertemplate: fullNames.map((m, i) =>
+                    `<b>${m}</b><br>Avg Time: ${sorted[i][1].avgTime.toFixed(1)}s<extra></extra>`
+                )
             };
 
-            const times = activeModels.map(m => modelStats[m].avgTime);
-            const maxTime = Math.max(...times) * 1.15;
+            const memTrace = {
+                x: names,
+                y: sorted.map(([, v]) => +v.avgMemory.toFixed(2)),
+                name: 'Memory (GB)',
+                type: 'bar',
+                marker: { color: '#8b5cf6', cornerradius: 3 },
+                hovertemplate: fullNames.map((m, i) =>
+                    `<b>${m}</b><br>Avg Memory: ${sorted[i][1].avgMemory.toFixed(2)} GB<extra></extra>`
+                )
+            };
 
-            const bubbleLayout = {
-                ...getPlotlyLayout(),
-                margin: { t: 10, b: 50, l: 50, r: 20 },
+            const layout = {
+                ...baseLayout(),
+                barmode: 'group',
+                bargap: 0.25,
+                bargroupgap: 0.08,
+                margin: { t: 8, b: 100, l: 48, r: 12 },
                 xaxis: {
-                    title: { text: 'Average Time (seconds)', font: { size: 11, color: c.muted } },
-                    range: [0, maxTime],
-                    zeroline: false,
-                    gridcolor: c.grid,
-                    linecolor: c.line,
-                    tickfont: { color: c.muted }
+                    tickangle: -40,
+                    tickfont: { size: 10, color: c.muted },
+                    automargin: true
                 },
                 yaxis: {
-                    title: { text: 'Average F1 Score (%)', font: { size: 11, color: c.muted } },
-                    range: [0, 120],
-                    tickvals: [0, 20, 40, 60, 80, 100],
+                    showgrid: true,
                     gridcolor: c.grid,
-                    linecolor: c.line,
-                    tickfont: { color: c.muted }
+                    zeroline: false,
+                    tickfont: { size: 11, color: c.muted }
                 },
-                hovermode: 'closest'
+                legend: {
+                    orientation: 'h',
+                    y: 1.06,
+                    x: 0.5,
+                    xanchor: 'center',
+                    font: { size: 11, color: c.text },
+                    bgcolor: 'transparent'
+                }
             };
 
-            Plotly.newPlot('bubble-chart', [bubbleTrace], bubbleLayout, {responsive: true, displayModeBar: false});
+            Plotly.newPlot('resource-chart', [timeTrace, memTrace], layout, plotlyConfig);
         }
 
-        // Initial chart render
-        updateCharts();
-        renderBubbleChart();
+        // ── Render all ──
+
+        function renderAllCharts() {
+            renderF1BarChart();
+            renderBubbleChart();
+            updateTimeChart();
+            renderResourceChart();
+        }
+
+        renderAllCharts();
     </script>
 </body>
 </html>
